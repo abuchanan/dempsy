@@ -1,0 +1,24 @@
+module.exports = {
+  load: ['grunt-contrib-htmlmin'],
+  config: {
+    dist: {
+      options: {
+        /*removeCommentsFromCDATA: true,
+        // https://github.com/yeoman/grunt-usemin/issues/44
+        //collapseWhitespace: true,
+        collapseBooleanAttributes: true,
+        removeAttributeQuotes: true,
+        removeRedundantAttributes: true,
+        useShortDoctype: true,
+        removeEmptyAttributes: true,
+        removeOptionalTags: true*/
+      },
+      files: [{
+        expand: true,
+        cwd: '<%= yeoman.app %>',
+        src: ['*.html', 'views/*.html'],
+        dest: '<%= yeoman.dist %>'
+      }]
+    }
+  },
+}

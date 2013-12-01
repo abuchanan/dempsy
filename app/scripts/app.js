@@ -1,15 +1,21 @@
 'use strict';
 
-angular.module('dempsyApp', [
+var mod = angular.module('dempsy', [
   'ngRoute'
-])
-  .config(function ($routeProvider) {
-    $routeProvider
-      .when('/', {
-        templateUrl: 'views/main.html',
-        controller: 'MainCtrl'
-      })
-      .otherwise({
-        redirectTo: '/'
-      });
-  });
+]);
+
+
+mod.config(function ($routeProvider) {
+  $routeProvider
+    .when('/', {
+      templateUrl: 'views/main.html',
+      controller: 'MainCtrl'
+    })
+    .otherwise({
+      redirectTo: '/'
+    });
+});
+
+
+mod.controller('MainCtrl', function ($scope) {
+});
