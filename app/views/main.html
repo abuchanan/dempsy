@@ -1,1 +1,23 @@
-foo
+<ul>
+  <li ng-repeat='q in crossword.across.get()'>{{ q.text }}
+    <!-- TODO not catching validation errors here -->
+    <input type='text' ng-model='guess' ng-change='q.guess(guess); buildTable();'>
+  </li>
+</ul>
+
+<ul>
+  <li ng-repeat='q in crossword.down.get()'>{{ q.text }}
+    <!-- TODO not catching validation errors here -->
+    <input type='text' ng-model='guess' ng-change='q.guess(guess); buildTable();'>
+  </li>
+</ul>
+
+<table>
+  <tbody>
+    <tr ng-repeat='row in rows track by $index'>
+      <td style='height: 30px; width: 30px; background-color: #ddd; 
+                 border: 1px solid #ccc; text-align: center;'
+          ng-repeat='col in row track by $index'>{{ col }}</td>
+    </tr>
+  </tbody>
+</table>

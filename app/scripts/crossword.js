@@ -43,7 +43,7 @@ function _Question(text, direction, x, y, length, crossingCollection) {
 
 _Question.prototype = {
 
-  _foreachCharPos: function(text, callback) {
+  forEachChar: function(text, callback) {
 
     if (this._direction == 'across') {
       var start = this._x;
@@ -71,7 +71,7 @@ _Question.prototype = {
 
     var q = this;
 
-    this._foreachCharPos(text, function(c, x, y) {
+    this.forEachChar(text, function(c, x, y) {
       var e = q._crossingCollection.charAt(x, y)
       if (e && c != e) {
         throw new ValidationError();
@@ -124,6 +124,7 @@ _Question.prototype = {
 
 function _QuestionCollection(direction) {
   this._questions = [];
+  this._max = 0;
 
   // TODO validate direction
   this._direction = direction;
@@ -133,6 +134,17 @@ function _QuestionCollection(direction) {
 _QuestionCollection.prototype = {
 
   add: function(text, x, y, length) {
+
+    // TODO test
+    if (this._direction == 'across') {
+      if (x + length > this._max) {
+        this._max = x + length;
+      }
+    } else {
+      if (y + length > this._max) {
+        this._max = y + length;
+      }
+    }
     // TODO shoudn't be able to add if crossing collection is null
     // TODO validate that it doesn't overlap some other question?
     // TODO replace add with init and add in bulk?
@@ -142,6 +154,10 @@ _QuestionCollection.prototype = {
 
     this._questions.push(q);
     return q;
+  },
+
+  max: function() {
+    return this._max;
   },
 
   // TODO change to 1-based?

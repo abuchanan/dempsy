@@ -4,86 +4,68 @@ module.exports = function (grunt) {
 
   require('time-grunt')(grunt);
 
+  var TASK_DIR = './tasks/';
+
   var config = {
+    // TODO replace "yeoman"
     yeoman: {
-      // configurable paths
-      app: require('./bower.json').appPath || 'app',
+      app: 'app',
       dist: 'dist'
     },
   };
 
-  var npm_tasks = [];
+  // TODO TaskLoader, allows default config and tasks
+  function loadTasks(tasks) {
+    var toLoad = {};
 
-  function load_task(name) {
-    var task = require('./tasks/config/' + name + '.js');
+    tasks.forEach(function(taskName) {
+      var task = require(TASK_DIR + taskName + '.js');
 
-    // TODO would be better to just pass grunt and config
-    //      to the task module and let it call these
-    for (var i = 0, ii = task.load.length; i < ii; i++) {
-      grunt.loadNpmTasks(task.load[i]);
-    }
+      if (task.load) {
+        task.load.forEach(function(name) {
+          toLoad[name] = 1;
+        });
+      }
 
-    var task_config = {};
-    task_config[name] = task.config;
+      if (task.config) {
+        // TODO using underscore is deprecated?
+        //      could use recurse
+        grunt.util._.extend(config, task.config);
+      }
+    });
 
-    grunt.util._.extend(config, task_config);
+    Object.keys(toLoad).forEach(function(name) {
+      grunt.loadNpmTasks(name);
+    });
+
+    // TODO initConfig or return config object?
+    grunt.initConfig(config);
   }
 
-  load_task('karma');
-  load_task('watch');
+  grunt.registerTask('server', function () {
 
+    loadTasks(['copy', 'clean', 'autoprefixer', 'connect', 'watch']);
 
-  grunt.initConfig(config);
-
-
-  grunt.registerTask('server', function (target) {
-    if (target === 'dist') {
-      return grunt.task.run(['build', 'connect:dist:keepalive']);
-    }
+    // TODO concurrent is broken for some reason. it doesn't get the same
+    //      config and copy:styles is missing
 
     grunt.task.run([
       'clean:server',
-      'concurrent:server',
+      'copy:styles',
       'autoprefixer',
       'connect:livereload',
-      'watch'
+      'watch',
     ]);
   });
 
-  grunt.registerTask('build', [
-    'clean:dist',
-    'useminPrepare',
-    'concurrent:dist',
-    'autoprefixer',
-    'concat',
-    'ngmin',
-    'copy:dist',
-    'cdnify',
-    'cssmin',
-    'uglify',
-    'rev',
-    'usemin'
-  ]);
 
-  grunt.registerTask('default', [
-    'jshint',
-    'test',
-    'build'
-  ]);
+  grunt.registerTask('test', function() {
 
+    loadTasks(['karma', 'watch']);
 
-  grunt.registerTask('test', [
-    'clean:server',
-    'concurrent:test',
-    'autoprefixer',
-    'connect:test',
-    'karma'
-  ]);
-
-  grunt.registerTask('foo', function() {
     grunt.task.run([
       'karma:unit',
       'watch:karma',
     ]);
-  })
+  });
 };
