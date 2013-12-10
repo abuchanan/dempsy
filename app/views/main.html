@@ -20,26 +20,20 @@
 
   <div class='col-md-3'>
     <h3>Across</h3>
-    <dl>
-      <dt ng-repeat-start='q in across | orderBy:getter'>{{ q.number }} {{ q.clue }}</dt>
-      <dd ng-repeat-end>
-        <!-- TODO not catching validation errors here -->
-        <input type='text' ng-model='guess' ng-init='guess = q.guess()'
-               ng-change='q.guess(guess); buildTable();'>
-      </dt>
-    </dl>
+    <ul class='list-unstyled'>
+      <li class='clue' ng-repeat='q in across | orderBy:number'
+          ng-click='highlight(q)'>
+        <span class='clue-number'>{{ q.number }}</span> {{ q.clue }}</li>
+    </ul>
   </div>
 
   <div class='col-md-3'>
     <h3>Down</h3>
-    <dl>
-      <dt ng-repeat-start='q in down | orderBy:number'>{{ q.number }} {{ q.clue }}</dt>
-      <dd ng-repeat-end>
-        <!-- TODO not catching validation errors here -->
-        <input type='text' ng-model='guess' ng-init='guess = q.guess()'
-               ng-change='q.guess(guess); buildTable();'>
-      </dt>
-    </dl>
+    <ul class='list-unstyled'>
+      <li class='clue' ng-repeat='q in down | orderBy:number'
+          ng-click='highlight(q)'>
+        <span class='clue-number'>{{ q.number }}</span> {{ q.clue }}</li>
+    </ul>
   </div>
 
 

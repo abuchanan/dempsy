@@ -45,13 +45,21 @@ function _Question(number, clue, direction, row, col, length, crossingCollection
 _Question.prototype = {
 
   forEachChar: function(text, callback) {
+    var i = 0;
+    this.forEachCell(function(row, col) {
+        callback(text.charAt(i), row, col);
+        i++;
+    });
+  },
+
+  forEachCell: function(callback) {
 
     if (this._direction == 'across') {
       var start = this._col;
       var constant = this._row;
 
       for (var i = 0, ii = this._length; i < ii; i++) {
-        callback(text.charAt(i), constant, start + i);
+        callback(constant, start + i);
       }
 
     } else {
@@ -59,7 +67,7 @@ _Question.prototype = {
       var constant = this._col;
 
       for (var i = 0, ii = this._length; i < ii; i++) {
-        callback(text.charAt(i), start + i, constant);
+        callback(start + i, constant);
       }
     }
   },

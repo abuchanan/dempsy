@@ -278,14 +278,16 @@ mod.controller('MainCtrl', function ($scope) {
           empty: true,
           isAcross: false,
           isDown: false,
+          highlight: false,
           toggleEmpty: function() {
             this.empty = !this.empty;
           },
           cssClass: function() {
-            if (this.empty) {
-              return 'empty';
-            } else {
-              return '';
+            var empty = this.empty;
+            var highlight = this.highlight;
+            return {
+              empty: empty,
+              highlight: highlight,
             }
           },
         });
@@ -325,6 +327,22 @@ mod.controller('MainCtrl', function ($scope) {
     });
 
     angular.forEach(across.concat(down), updateCells);
+
+    var currentHighlight = false;
+
+    $scope.highlight = function(q) {
+      if (currentHighlight) {
+        currentHighlight.forEachCell(function(row, col) {
+          $scope.rows[row][col].highlight = false;
+        });
+      }
+
+      currentHighlight = q;
+
+      q.forEachCell(function(row, col) {
+        $scope.rows[row][col].highlight = true;
+      });
+    };
   }
 
 

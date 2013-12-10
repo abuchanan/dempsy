@@ -43,9 +43,26 @@ body {
 .crossword-cell.empty {
   background-color: black;
 }
+
+.crossword-cell.highlight {
+  background-color: #eee;
+}
+
 .crossword-cell .cell-number {
   position: relative;
   top: -12px;
   left: -8px;
   font-size: 0.6em;
+}
+
+.clue {
+  cursor: default;
+}
+
+.clue-number {
+  font-weight: bold;
+  display: inline-block;
+  width: 20px;
+  text-align: right;
+  margin-right: 10px;
 }
