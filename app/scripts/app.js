@@ -248,20 +248,18 @@ mod.controller('MainCtrl', function ($scope) {
 
   $scope.word = /^\w$/;
 
-  var crossword = new Crossword();
+  var crossword = $scope.crossword = new Crossword();
 
-  angular.forEach(crosswordData.across, function(a, num) {
-    crossword.across.add(num, a.clue, a.row, a.col, a.length);
+  angular.forEach(crosswordData.across, function(a) {
+    crossword.across.add(a.number, a.clue, a.row, a.col, a.length);
   });
 
-  angular.forEach(crosswordData.down, function(d, num) {
-    crossword.down.add(num, d.clue, d.row, d.col, d.length);
+  angular.forEach(crosswordData.down, function(d) {
+    crossword.down.add(d.number, d.clue, d.row, d.col, d.length);
   });
 
   crossword.across.get(1).guess('abcde');
 
-
-  $scope.crossword = crossword;
 
   // TODO well...this is all rather a mess, and probably very inefficient
 
@@ -316,8 +314,17 @@ mod.controller('MainCtrl', function ($scope) {
       });
     }
 
-    angular.forEach(crossword.across.get(), updateCells);
-    angular.forEach(crossword.down.get(), updateCells);
+    var across = $scope.across = [];
+    angular.forEach(crossword.across.get(), function(q) {
+      across.push(q);
+    });
+
+    var down = $scope.down = [];
+    angular.forEach(crossword.down.get(), function(q) {
+      down.push(q);
+    });
+
+    angular.forEach(across.concat(down), updateCells);
   }
 
 
