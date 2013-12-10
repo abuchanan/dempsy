@@ -68,18 +68,21 @@ _Question.prototype = {
 
     if (guess.length != this._length) {
       // TODO better error
-      throw new ValidationError();
+      return false;
     }
 
     var q = this;
+    var valid = true;
 
     this.forEachChar(guess, function(c, row, col) {
       var crossingChar = q._crossingCollection.charAt(row, col);
       if (crossingChar && c != crossingChar) {
         // TODO better error
-        throw new ValidationError();
+        valid = false;
       }
     });
+
+    return valid;
   },
 
   length: function() {
@@ -93,9 +96,12 @@ _Question.prototype = {
         this._guess = text;
 
       } else {
-        this._validate(text);
-        this._guess = text;
-        this._guesses.add(text);
+        if (this._validate(text)) {
+          this._guess = text;
+          this._guesses.add(text);
+        } else {
+          this._guess = '';
+        }
       }
     }
     return this._guess;

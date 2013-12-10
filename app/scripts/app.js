@@ -246,6 +246,8 @@ mod.controller('BuilderCtrl', function($scope) {
 
 mod.controller('MainCtrl', function ($scope) {
 
+  $scope.word = /^\w$/;
+
   var crossword = new Crossword();
 
   angular.forEach(crosswordData.across, function(a, num) {
@@ -256,6 +258,7 @@ mod.controller('MainCtrl', function ($scope) {
     crossword.down.add(num, d.clue, d.row, d.col, d.length);
   });
 
+  crossword.across.get(1).guess('abcde');
 
 
   $scope.crossword = crossword;
@@ -317,7 +320,6 @@ mod.controller('MainCtrl', function ($scope) {
     angular.forEach(crossword.down.get(), updateCells);
   }
 
-  crossword.across.get(1).guess('abcde');
 
   buildTable();
 

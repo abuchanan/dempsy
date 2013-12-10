@@ -1,32 +1,43 @@
-<table>
-  <tbody>
-    <tr ng-repeat='row in rows track by $index'>
-      <td class='crossword-cell'
-          ng-repeat='col in row track by $index'
-          ng-class='col.cssClass()'
-          ng-click='col.toggleEmpty()'>
-        <span class='cell-number' ng-show='!col.empty'>{{ col.number }}</span> {{ col.content }}</td>
-    </tr>
-  </tbody>
-</table>
+<div class='row'>
 
-<button ng-click='inspect()'>Inspect</button>
+  <div class='col-md-6'>
+    <table>
+      <tbody>
+        <tr ng-repeat='row in rows track by $index'>
+          <td class='crossword-cell'
+              ng-repeat='col in row track by $index'
+              ng-class='col.cssClass()'
+              ng-click='col.toggleEmpty()'>
+            <span class='cell-number' ng-show='!col.empty'>{{ col.number }}</span> {{ col.content }}</td>
+        </tr>
+      </tbody>
+    </table>
 
-<textarea ng-model='crosswordJson' style='height: 200px; width: 500px;'></textarea>
+    <button ng-click='inspect()'>Inspect</button>
 
-<h3>Across</h3>
-<ul>
-  <li ng-repeat='q in crossword.across.get()'>{{ q.number }} {{ q.text }}
-    <!-- TODO not catching validation errors here -->
-    <input type='text' ng-model='guess' ng-change='q.guess(guess); buildTable();'>
-  </li>
-</ul>
+    <textarea ng-model='crosswordJson' style='height: 200px; width: 500px;'></textarea>
+    </div>
 
-<h3>Down</h3>
-<ul>
-  <li ng-repeat='q in crossword.down.get()'>{{ q.number }} {{ q.text }}
-    <!-- TODO not catching validation errors here -->
-    <input type='text' ng-model='guess' ng-change='q.guess(guess); buildTable();'>
-  </li>
-</ul>
+  <div class='col-md-3'>
+    <h3>Across</h3>
+    <ul>
+      <li ng-repeat='q in crossword.across.get()'>{{ q.number }} {{ q.clue }}
+        <!-- TODO not catching validation errors here -->
+        <input type='text' ng-model='guess' ng-init='guess = q.guess()'
+               ng-change='q.guess(guess); buildTable();'>
+      </li>
+    </ul>
+  </div>
 
+  <div class='col-md-3'>
+    <h3>Down</h3>
+    <ul>
+      <li ng-repeat='q in crossword.down.get()'>{{ q.number }} {{ q.clue }}
+        <!-- TODO not catching validation errors here -->
+        <input type='text' ng-model='guess' ng-change='q.guess(guess); buildTable();'>
+      </li>
+    </ul>
+  </div>
+
+
+</div>
