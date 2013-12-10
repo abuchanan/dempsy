@@ -249,11 +249,11 @@ mod.controller('MainCtrl', function ($scope) {
   var crossword = new Crossword();
 
   angular.forEach(crosswordData.across, function(a, num) {
-    crossword.across.add(num, a.clue, a.col, a.row, a.length);
+    crossword.across.add(num, a.clue, a.row, a.col, a.length);
   });
 
   angular.forEach(crosswordData.down, function(d, num) {
-    crossword.down.add(num, d.clue, d.col, d.row, d.length);
+    crossword.down.add(num, d.clue, d.row, d.col, d.length);
   });
 
 
@@ -291,14 +291,12 @@ mod.controller('MainCtrl', function ($scope) {
       }
     }
 
-
     // now fill in the cells that have content
-    var questions = crossword.down.get().concat(crossword.across.get());
 
-    angular.forEach(questions, function(q) {
+    function updateCells(q) {
       var charIdx = 0;
 
-      q.forEachChar(q.guess(), function(c, col, row) {
+      q.forEachChar(q.guess(), function(c, row, col) {
 
         var cell = rows[row][col];
         cell.empty = false;
@@ -313,10 +311,13 @@ mod.controller('MainCtrl', function ($scope) {
 
         charIdx++;
       });
-    });
+    }
+
+    angular.forEach(crossword.across.get(), updateCells);
+    angular.forEach(crossword.down.get(), updateCells);
   }
 
-  crossword.across.get(0).guess('abcde');
+  crossword.across.get(1).guess('abcde');
 
   buildTable();
 

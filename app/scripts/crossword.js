@@ -28,13 +28,13 @@ Guesses.prototype = {
 };
 
 
-function _Question(number, text, direction, x, y, length, crossingCollection) {
+function _Question(number, clue, direction, row, col, length, crossingCollection) {
   this.number = number;
-  this.text = text;
+  this.clue = clue;
 
   this._direction = direction;
-  this._x = x;
-  this._y = y;
+  this._row = row;
+  this._col = col;
   this._length = length;
   this._crossingCollection = crossingCollection;
 
@@ -47,34 +47,36 @@ _Question.prototype = {
   forEachChar: function(text, callback) {
 
     if (this._direction == 'across') {
-      var start = this._x;
-      var constant = this._y;
-
-      for (var i = 0, ii = this._length; i < ii; i++) {
-        callback(text.charAt(i), start + i, constant);
-      }
-
-    } else {
-      var start = this._y;
-      var constant = this._x;
+      var start = this._col;
+      var constant = this._row;
 
       for (var i = 0, ii = this._length; i < ii; i++) {
         callback(text.charAt(i), constant, start + i);
       }
+
+    } else {
+      var start = this._row;
+      var constant = this._col;
+
+      for (var i = 0, ii = this._length; i < ii; i++) {
+        callback(text.charAt(i), start + i, constant);
+      }
     }
   },
 
-  _validate: function(text) {
+  _validate: function(guess) {
 
-    if (text.length != this._length) {
+    if (guess.length != this._length) {
+      // TODO better error
       throw new ValidationError();
     }
 
     var q = this;
 
-    this.forEachChar(text, function(c, x, y) {
-      var e = q._crossingCollection.charAt(x, y)
-      if (e && c != e) {
+    this.forEachChar(guess, function(c, row, col) {
+      var crossingChar = q._crossingCollection.charAt(row, col);
+      if (crossingChar && c != crossingChar) {
+        // TODO better error
         throw new ValidationError();
       }
     });
@@ -103,20 +105,20 @@ _Question.prototype = {
     return this._guesses.get();
   },
 
-  contains: function(x, y) {
+  contains: function(row, col) {
     if (this._direction == 'across') {
-      return this._y == y && x >= this._x && x <= this._x + this._length;
+      return this._row == row && col >= this._col && col <= this._col + this._length;
     } else {
-      return this._x == x && y >= this._y && y <= this._y + this._length;
+      return this._col == col && row >= this._row && row <= this._row + this._length;
     }
   },
 
-  charAt: function(x, y) {
+  charAt: function(row, col) {
 
     if (this._direction == 'across') {
-      var p = x - this._x;
+      var p = col - this._col;
     } else {
-      var p = y - this._y;
+      var p = row - this._row;
     }
     return this._guess.charAt(p);
   },
@@ -134,26 +136,26 @@ function _QuestionCollection(direction) {
 
 _QuestionCollection.prototype = {
 
-  add: function(number, text, x, y, length) {
+  add: function(number, clue, row, col, length) {
 
     // TODO test
     if (this._direction == 'across') {
-      if (x + length > this._max) {
-        this._max = x + length;
+      if (col + length > this._max) {
+        this._max = col + length;
       }
     } else {
-      if (y + length > this._max) {
-        this._max = y + length;
+      if (row + length > this._max) {
+        this._max = row + length;
       }
     }
     // TODO shoudn't be able to add if crossing collection is null
     // TODO validate that it doesn't overlap some other question?
     // TODO replace add with init and add in bulk?
 
-    var q = new _Question(number, text, this._direction, x, y, length,
+    var q = new _Question(number, clue, this._direction, row, col, length,
                           this._crossingCollection);
 
-    this._questions.push(q);
+    this._questions[number] = q;
     return q;
   },
 
@@ -161,25 +163,21 @@ _QuestionCollection.prototype = {
     return this._max;
   },
 
-  // TODO change to 1-based?
-  // TODO maybe get should _require_ idx, and have a separate method
-  //      for getting all questions
   get: function(idx) {
     if (idx === undefined) {
-      // Return a copy of the internal array to prevent external modifications
-      return this._questions.slice(0);
+      // Return a copy in order to prevent external modifications
+      return angular.extend({}, this._questions);
     }
     // TODO catch index error
     return this._questions[idx];
   },
 
-  charAt: function(x, y) {
-    for (var i = 0, ii = this._questions.length; i < ii; i++) {
-      var q = this._questions[i];
-      if (q.contains(x, y)) {
-        return q.charAt(x, y);
+  charAt: function(row, col) {
+    angular.forEach(this._questions, function(q) {
+      if (q.contains(row, col)) {
+        return q.charAt(row, col);
       }
-    }
+    });
   },
 };
 
