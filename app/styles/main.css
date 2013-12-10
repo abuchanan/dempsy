@@ -77,3 +77,22 @@ body {
     border-bottom: 0;
   }
 }
+
+
+
+.crossword-cell {
+  height: 35px;
+  width: 35px;
+  border: 1px solid black;
+  text-align: center;
+}
+
+.crossword-cell.empty {
+  background-color: black;
+}
+.crossword-cell .cell-number {
+  position: relative;
+  top: -12px;
+  left: -8px;
+  font-size: 0.6em;
+}

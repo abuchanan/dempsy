@@ -28,7 +28,8 @@ Guesses.prototype = {
 };
 
 
-function _Question(text, direction, x, y, length, crossingCollection) {
+function _Question(number, text, direction, x, y, length, crossingCollection) {
+  this.number = number;
   this.text = text;
 
   this._direction = direction;
@@ -133,7 +134,7 @@ function _QuestionCollection(direction) {
 
 _QuestionCollection.prototype = {
 
-  add: function(text, x, y, length) {
+  add: function(number, text, x, y, length) {
 
     // TODO test
     if (this._direction == 'across') {
@@ -149,7 +150,7 @@ _QuestionCollection.prototype = {
     // TODO validate that it doesn't overlap some other question?
     // TODO replace add with init and add in bulk?
 
-    var q = new _Question(text, this._direction, x, y, length,
+    var q = new _Question(number, text, this._direction, x, y, length,
                           this._crossingCollection);
 
     this._questions.push(q);
