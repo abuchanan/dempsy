@@ -328,21 +328,25 @@ mod.controller('MainCtrl', function ($scope) {
 
     angular.forEach(across.concat(down), updateCells);
 
-    var currentHighlight = false;
+    $scope.highlight = {
+      question: false,
+    };
 
-    $scope.highlight = function(q) {
-      if (currentHighlight) {
-        currentHighlight.forEachCell(function(row, col) {
+    $scope.$watch('highlight.question', function(newHighlight, oldHighlight) {
+      console.log(newHighlight);
+
+      if (oldHighlight) {
+        oldHighlight.forEachCell(function(row, col) {
           $scope.rows[row][col].highlight = false;
         });
       }
 
-      currentHighlight = q;
-
-      q.forEachCell(function(row, col) {
-        $scope.rows[row][col].highlight = true;
-      });
-    };
+      if (newHighlight) {
+        newHighlight.forEachCell(function(row, col) {
+          $scope.rows[row][col].highlight = true;
+        });
+      }
+    });
   }
 
 

@@ -45,7 +45,7 @@ body {
 }
 
 .crossword-cell.highlight {
-  background-color: #eee;
+  background-color: #D9EDF7;
 }
 
 .crossword-cell .cell-number {
@@ -57,6 +57,10 @@ body {
 
 .clue {
   cursor: default;
+}
+
+.clue.highlight {
+  background-color: #D9EDF7;
 }
 
 .clue-number {
