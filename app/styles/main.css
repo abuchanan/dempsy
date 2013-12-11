@@ -44,8 +44,15 @@ body {
   background-color: black;
 }
 
-.crossword-cell.highlight {
-  background-color: #D9EDF7;
+.across-selected .crossword-cell.highlight.across,
+.down-selected .crossword-cell.highlight.down {
+  background-color: #D9EDF7 !important;
+}
+
+.across-selected .crossword-cell.highlight.down,
+.down-selected .crossword-cell.highlight.across {
+  /* background-color: #FCF8E3; */
+  background-color: #eee;
 }
 
 .crossword-cell .cell-number {
@@ -63,8 +70,14 @@ body {
   cursor: default;
 }
 
-.clue.highlight {
-  background-color: #D9EDF7;
+.across-selected .clue.highlight.across,
+.down-selected .clue.highlight.down {
+  background-color: #D9EDF7 !important;
+}
+
+.across-selected .clue.highlight.down,
+.down-selected .clue.highlight.across {
+  background-color: #eee;
 }
 
 .clue-number {

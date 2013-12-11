@@ -51,6 +51,8 @@ mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
       }
     };
 
+    var direction;
+
     function _clearCell() {
         if (selected.cell) {
           selected.cell.selected = false;
@@ -74,17 +76,34 @@ mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
       }
     }
 
+
     function _question(question) {
       selected.questions[question.direction] = question;
       question.setHighlight(true);
     }
 
+
+    function _toggleDirection() {
+      if (direction == 'across') {
+        direction = 'down';
+      } else {
+        direction = 'across';
+      }
+    }
+
     
     this.cell = function(cell) {
-      if (!cell.empty() && cell !== selected.cell) {
+      if (cell.empty()) {
+        return;
+      }
+
+      if (cell === selected.cell) {
+        _toggleDirection();
+      } else {
 
         _clearCell();
         _clearQuestions();
+        direction = 'across';
 
         selected.cell = cell;
         cell.selected = true;
@@ -99,12 +118,48 @@ mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
       }
     };
 
+
     this.question = function(question) {
       this.cell(question.getCell(0));
+      direction = question.direction;
+    };
+
+
+    this.currentCell = function() {
+      return selected.cell;
+    };
+
+    this.directionClass = function() {
+      if (direction) {
+        return direction + '-selected';
+      }
+      return '';
     };
   }
 
-  $scope.select = new SelectedManager();
+  var selectedManager = $scope.select = new SelectedManager();
+
+
+  $document.keypress(function(event) {
+    var currentCell = selectedManager.currentCell();
+
+    if (currentCell) {
+      if (event.which != 0 && event.charCode != 0) {
+        var c = String.fromCharCode(event.which);
+
+        $scope.$apply(function() {
+          currentCell.content = c;
+          var nextCell = rows[currentCell.row][currentCell.col + 1];
+
+          if (nextCell && !nextCell.empty()) {
+            selectedManager.cell(nextCell);
+          }
+        });
+
+      } else {
+      }
+    }
+  });
 
 
   function initCells(width, height) {
@@ -118,11 +173,14 @@ mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
         row.push({
           number: '',
           content: '',
+          row: i,
+          col: j,
           questions: {
             across: false,
             down: false,
           },
           highlight: false,
+          highlightDirection: '',
           selected: false,
 
           empty: function() {
@@ -132,11 +190,13 @@ mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
           cssClass: function() {
             var self = this;
 
-            return {
+            var d = {
               empty: self.empty(),
-              highlight: self.highlight,
+              highlight: !self.selected && self.highlight,
               selected: self.selected,
-            }
+            };
+            d[self.highlightDirection] = true;
+            return d;
           },
         });
       }
@@ -167,9 +227,11 @@ mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
 
       cssClass: function() {
         var self = this;
-        return {
+        var d = {
           highlight: self._highlighted,
         }
+        d[self.direction] = true;
+        return d
       },
 
       isHighlighted: function() {
@@ -179,8 +241,10 @@ mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
       setHighlight: function(val) {
         val = Boolean(val);
         this._highlighted = val;
+        var direction = this.direction;
         this.forEachCell(function(cell) {
           cell.highlight = val;
+          cell.highlightDirection = direction;
         });
       },
 
@@ -208,19 +272,5 @@ mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
   angular.forEach(crossword.across.get(), addQuestion);
   angular.forEach(crossword.down.get(), addQuestion);
 
-
-  $document.keypress(function(event) {
-    if (currentSelected) {
-      if (event.which != 0 && event.charCode != 0) {
-        var c = String.fromCharCode(event.which);
-
-        $scope.$apply(function() {
-          currentSelected.content = c;
-        });
-
-      } else {
-      }
-    }
-  });
 
 });
