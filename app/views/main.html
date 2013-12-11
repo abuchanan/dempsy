@@ -5,40 +5,40 @@
       <tbody>
         <tr ng-repeat='row in rows track by $index'>
           <td class='crossword-cell'
-              ng-repeat='col in row track by $index'
-              ng-class='col.cssClass()'
-              ng-click='col.toggleEmpty()'>
-            <span class='cell-number' ng-show='!col.empty'>{{ col.number }}</span> {{ col.content }}</td>
+              ng-repeat='cell in row track by $index'
+              ng-class='cell.cssClass()'
+              ng-click='select.cell(cell)'>
+            <span class='cell-number' ng-show='!cell.empty()'>{{ cell.number }}</span> {{ cell.content }}</td>
         </tr>
       </tbody>
     </table>
+  </div>
 
-    <button ng-click='inspect()'>Inspect</button>
-
-    <textarea ng-model='crosswordJson' style='height: 200px; width: 500px;'></textarea>
-    </div>
+  <script type='text/ng-template' id='question-list.html'>
+  </script>
 
   <div class='col-md-3'>
     <h3>Across</h3>
     <ul class='list-unstyled'>
       <li class='clue'
-          ng-class='{highlight: q === highlight.question}'
-          ng-repeat='q in across | orderBy:number'
-          ng-click='highlight.question = q'>
-        <span class='clue-number'>{{ q.number }}</span> {{ q.clue }}</li>
+          ng-repeat='q in questions.across | orderBy:number'
+          ng-class='q.cssClass()'
+          ng-click='select.question(q)'>
+        <span class='clue-number'>{{ q.number }}</span> {{ q.clue }}
+      </li>
     </ul>
   </div>
 
   <div class='col-md-3'>
     <h3>Down</h3>
     <ul class='list-unstyled'>
-      <li class='clue' 
-          ng-class='{highlight: q === highlight.question}'
-          ng-repeat='q in down | orderBy:number'
-          ng-click='highlight.question = q'>
-        <span class='clue-number'>{{ q.number }}</span> {{ q.clue }}</li>
+      <li class='clue'
+          ng-repeat='q in questions.down | orderBy:number'
+          ng-class='q.cssClass()'
+          ng-click='select.question(q)'>
+        <span class='clue-number'>{{ q.number }}</span> {{ q.clue }}
+      </li>
     </ul>
   </div>
-
 
 </div>

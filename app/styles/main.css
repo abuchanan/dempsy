@@ -55,6 +55,10 @@ body {
   font-size: 0.6em;
 }
 
+.crossword-cell.selected {
+  background-color: #5BC0DE;
+}
+
 .clue {
   cursor: default;
 }

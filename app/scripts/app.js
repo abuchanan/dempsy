@@ -18,340 +18,209 @@ mod.config(function ($routeProvider) {
 });
 
 
-var clues = {
-  across: [
-    "It's a no-no",
-    "Up for it",
-    "Hook attachment",
-    "Shia's deity",
-    "Letter-shaped beam",
-    "Long ago",
-    "Colorful food fish",
-    "Kid around",
-    "Mix up",
-    "Deeply hurt",
-    "Benevolent fellow",
-    "Poem of exaltation",
-    "Quitter's cry",
-    "Abs strengtheners",
-    "Big bash",
-    "Partner of poivre",
-    "Ark complement",
-    "Checks for errors",
-    "Ramadan observance",
-    "Be testy with",
-    "Pride member",
-    "Little terror",
-    "Genesis garden",
-    "Attached, in a way",
-    "Racial equality org.",
-    "Whale group",
-    "Suffix with butyl",
-    "Gulliver's creator",
-    "Mineralogists' samples",
-    "Met solo",
-    "Game played on a wall",
-    "Scot's attire",
-    "Took a turn",
-    "Like leprechauns",
-    "To be, to Brutus",
-    "Scots' turndowns",
-    "Conical dwelling",
-  ],
-  down: [
-    "\"___ Te Ching\"",
-    "Yodeler's setting",
-    "Semiformal",
-    "Pearl Harbor site",
-    "\"Come on, that's enough!\"",
-    "Doll for boys",
-    "Help in wrongdoing",
-    "Kind of note",
-    "Art Deco notable",
-    "Petty officer",
-    "Class clown's doings",
-    "Yule tree hanging",
-    "Pulitzer winner Studs",
-    "N.F.L. six-pointers",
-    "Drink heartily",
-    "\"I know what you're thinking\" ability",
-    "Fish story teller",
-    "www addresses",
-    "Wordless \"Ouch!\"",
-    "Summer month, in Paris",
-    "Rock's ___ Lobos",
-    "Sherlock Holmes prop",
-    "Red tag event",
-    "Klutzy",
-    "___ about (rove)",
-    "Excursion diversion",
-    "Cel character",
-    "S.F.-to-Spokane direction",
-    "Bit of humor most people can't get",
-    "Native New Zealanders",
-    "Discussion groups",
-    "Wrecker's job",
-    "\"Finally finished!\"",
-    "Social stratum",
-    "Jr.-year exams",
-    "Goldie of \"Laugh-In\"",
-    "General vicinity",
-    "Punch-in time for many",
-    "MetroCard cost",
-    "\"The Waste Land\" monogram",
-    "___-crab soup",
-  ]
-};
+mod.service('CrosswordData', function() {
+  this.get = function() {
+    var crossword = new Crossword();
 
-
-
-mod.controller('BuilderCtrl', function($scope) {
-  var gridSize = 15;
-
-  var rows = $scope.rows = [];
-
-  for (var i = 0; i < gridSize; i++) {
-    var row = [];
-    rows.push(row);
-
-    for (var j = 0; j < gridSize; j++) {
-        row.push({
-          number: '',
-          content: '',
-          empty: false,
-          isAcross: false,
-          isDown: false,
-          toggleEmpty: function() {
-            this.empty = !this.empty;
-          },
-          cssClass: function() {
-            if (this.empty) {
-              return 'empty';
-            } else {
-              return '';
-            }
-          },
-        });
-    }
-  }
-
-  $scope.inspect = function() {
-    var num = 1;
-    var downIdx = 0;
-    var acrossIdx = 0;
-
-    var crossword = {
-      size: gridSize,
-      across: {},
-      down: {},
-    };
-
-    var currentAcrosses = {};
-    var currentDowns = {};
-
-    for (var row = 0; row < gridSize; row++) {
-      for (var col = 0; col < gridSize; col++) {
-        var cell = rows[row][col];
-
-        if (cell.empty) {
-
-          if (currentDowns[col]) {
-            var d = currentDowns[col];
-            delete currentDowns[col];
-            d.length = row - d.row;
-            crossword.down[d.number] = d;
-          }
-
-          if (currentAcrosses[row]) {
-            var a = currentAcrosses[row];
-            delete currentAcrosses[row];
-            a.length = col - a.col;
-            crossword.across[a.number] = a;
-          }
-
-        } else {
-
-          if (row == 0) {
-            cell.isDown = true;
-          }
-
-          if (col == 0) {
-            cell.isAcross = true;
-          }
-
-          if (row > 0) {
-            var cellAbove = rows[row - 1][col];
-            if (cellAbove.empty) {
-              cell.isDown = true;
-            }
-          }
-
-          if (col > 0) {
-            var cellLeft = rows[row][col - 1];
-            if (cellLeft.empty) {
-              cell.isAcross = true;
-            }
-          }
-
-          if (cell.isAcross || cell.isDown) {
-            cell.number = num++;
-            cell.row = row;
-            cell.col = col;
-          }
-
-          if (cell.isDown && cell.isAcross) {
-
-              var downCell = angular.extend({}, cell);
-              downCell.clue = clues.down[downIdx];
-              currentDowns[col] = downCell;
-              downIdx++;
-
-              cell.clue = clues.across[acrossIdx];
-              currentAcrosses[row] = cell;
-              acrossIdx++;
-          }
-
-          else if (cell.isDown) {
-            cell.clue = clues.down[downIdx];
-            currentDowns[col] = cell;
-            downIdx++;
-          }
-
-          else if (cell.isAcross) {
-            cell.clue = clues.across[acrossIdx];
-            currentAcrosses[row] = cell;
-            acrossIdx++;
-          }
-
-        }
-      }
-    }
-
-    angular.forEach(currentDowns, function(down) {
-      down.length = gridSize - down.row;
-      crossword.down[down.number] = down;
+    angular.forEach(crosswordData.across, function(a) {
+      crossword.across.add(a.number, a.clue, a.row, a.col, a.length);
     });
 
-    angular.forEach(currentAcrosses, function(across) {
-      across.length = gridSize - across.col;
-      crossword.across[across.number] = across;
+    angular.forEach(crosswordData.down, function(d) {
+      crossword.down.add(d.number, d.clue, d.row, d.col, d.length);
     });
-
-    $scope.crosswordJson = angular.toJson(crossword);
-
-
+    return crossword;
   };
 });
 
 
-mod.controller('MainCtrl', function ($scope) {
+mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
 
-  $scope.word = /^\w$/;
-
-  var crossword = $scope.crossword = new Crossword();
-
-  angular.forEach(crosswordData.across, function(a) {
-    crossword.across.add(a.number, a.clue, a.row, a.col, a.length);
-  });
-
-  angular.forEach(crosswordData.down, function(d) {
-    crossword.down.add(d.number, d.clue, d.row, d.col, d.length);
-  });
-
-  crossword.across.get(1).guess('abcde');
+  var crossword = CrosswordData.get();
 
 
-  // TODO well...this is all rather a mess, and probably very inefficient
+  var rows = $scope.rows = [];
 
-  function buildTable() {
-    var rows = $scope.rows = [];
-  
-    // initialize all cells
-    for (var i = 0, ii = crossword.down.max(); i < ii; i++) {
+  function SelectedManager() {
+
+    var selected = {
+      cell: false,
+      questions: {
+        across: false,
+        down: false,
+      }
+    };
+
+    function _clearCell() {
+        if (selected.cell) {
+          selected.cell.selected = false;
+        }
+        selected.cell = false;
+    }
+
+    function _clearQuestions() {
+      var across = selected.questions.across;
+      selected.questions.across = false;
+
+      if (across) {
+        across.setHighlight(false);
+      }
+
+      var down = selected.questions.down;
+      selected.questions.down = false;
+
+      if (down) {
+        down.setHighlight(false);
+      }
+    }
+
+    function _question(question) {
+      selected.questions[question.direction] = question;
+      question.setHighlight(true);
+    }
+
+    
+    this.cell = function(cell) {
+      if (!cell.empty() && cell !== selected.cell) {
+
+        _clearCell();
+        _clearQuestions();
+
+        selected.cell = cell;
+        cell.selected = true;
+
+        if (cell.questions.across) {
+          _question(cell.questions.across);
+        }
+
+        if (cell.questions.down) {
+          _question(cell.questions.down);
+        }
+      }
+    };
+
+    this.question = function(question) {
+      this.cell(question.getCell(0));
+    };
+  }
+
+  $scope.select = new SelectedManager();
+
+
+  function initCells(width, height) {
+    // Initialize all cells.
+    for (var i = 0; i < height; i++) {
       var row = [];
       rows.push(row);
 
-      for (var j = 0, jj = crossword.across.max(); j < jj; j++) {
+      for (var j = 0; j < width; j++) {
+
         row.push({
           number: '',
           content: '',
-          empty: true,
-          isAcross: false,
-          isDown: false,
-          highlight: false,
-          toggleEmpty: function() {
-            this.empty = !this.empty;
+          questions: {
+            across: false,
+            down: false,
           },
+          highlight: false,
+          selected: false,
+
+          empty: function() {
+            return !this.questions.across && !this.questions.down;
+          },
+
           cssClass: function() {
-            var empty = this.empty;
-            var highlight = this.highlight;
+            var self = this;
+
             return {
-              empty: empty,
-              highlight: highlight,
+              empty: self.empty(),
+              highlight: self.highlight,
+              selected: self.selected,
             }
           },
         });
       }
     }
-
-    // now fill in the cells that have content
-
-    function updateCells(q) {
-      var charIdx = 0;
-
-      q.forEachChar(q.guess(), function(c, row, col) {
-
-        var cell = rows[row][col];
-        cell.empty = false;
-
-        if (charIdx == 0) {
-          cell.number = q.number;
-        }
-
-        if (c) {
-          cell.content = c;
-        }
-
-        charIdx++;
-      });
-    }
-
-    var across = $scope.across = [];
-    angular.forEach(crossword.across.get(), function(q) {
-      across.push(q);
-    });
-
-    var down = $scope.down = [];
-    angular.forEach(crossword.down.get(), function(q) {
-      down.push(q);
-    });
-
-    angular.forEach(across.concat(down), updateCells);
-
-    $scope.highlight = {
-      question: false,
-    };
-
-    $scope.$watch('highlight.question', function(newHighlight, oldHighlight) {
-      console.log(newHighlight);
-
-      if (oldHighlight) {
-        oldHighlight.forEachCell(function(row, col) {
-          $scope.rows[row][col].highlight = false;
-        });
-      }
-
-      if (newHighlight) {
-        newHighlight.forEachCell(function(row, col) {
-          $scope.rows[row][col].highlight = true;
-        });
-      }
-    });
   }
 
+  var questions = $scope.questions = {
+    across: [],
+    down: [],
+  };
 
-  buildTable();
+  function addQuestion(question) {
 
-  $scope.buildTable = buildTable;
+    // Create a wrapper around the question that is more specific
+    // to this controller.
+    var wrapper = {
+      question: question,
+      number: question.number,
+      clue: question.clue,
+      direction: question._direction,
+      _highlighted: false,
+
+      forEachCell: function(callback) {
+        this.question.forEachCell(function(row, col) {
+          callback(rows[row][col]);
+        });
+      },
+
+      cssClass: function() {
+        var self = this;
+        return {
+          highlight: self._highlighted,
+        }
+      },
+
+      isHighlighted: function() {
+        return this._highlighted;
+      },
+
+      setHighlight: function(val) {
+        val = Boolean(val);
+        this._highlighted = val;
+        this.forEachCell(function(cell) {
+          cell.highlight = val;
+        });
+      },
+
+      getCell: function(idx) {
+        if (this.direction == 'across') {
+          return rows[this.question._row][this.question._col + idx];
+        } else {
+          return rows[this.question._row + idx][this.question._col];
+        }
+      },
+    };
+
+    // Link this question to each of its cells.
+    wrapper.forEachCell(function(cell) {
+      cell.questions[wrapper.direction] = wrapper;
+    });
+
+    // Set the cell number of the first cell in the question.
+    wrapper.getCell(0).number = wrapper.number;
+
+    questions[wrapper.direction].push(wrapper);
+  };
+
+  initCells(crossword.across.max(), crossword.down.max());
+  angular.forEach(crossword.across.get(), addQuestion);
+  angular.forEach(crossword.down.get(), addQuestion);
+
+
+  $document.keypress(function(event) {
+    if (currentSelected) {
+      if (event.which != 0 && event.charCode != 0) {
+        var c = String.fromCharCode(event.which);
+
+        $scope.$apply(function() {
+          currentSelected.content = c;
+        });
+
+      } else {
+      }
+    }
+  });
 
 });

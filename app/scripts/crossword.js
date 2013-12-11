@@ -3,9 +3,6 @@
 var mod = angular.module('dempsy.crossword', []);
 
 
-function ValidationError() {}
-
-
 function Guesses() {
   this._guesses = [];
 }
@@ -28,7 +25,8 @@ Guesses.prototype = {
 };
 
 
-function _Question(number, clue, direction, row, col, length, crossingCollection) {
+
+function _Question(number, clue, direction, row, col, length) {
   this.number = number;
   this.clue = clue;
 
@@ -36,21 +34,9 @@ function _Question(number, clue, direction, row, col, length, crossingCollection
   this._row = row;
   this._col = col;
   this._length = length;
-  this._crossingCollection = crossingCollection;
-
-  this._guess = '';
-  this._guesses = new Guesses();
 }
 
 _Question.prototype = {
-
-  forEachChar: function(text, callback) {
-    var i = 0;
-    this.forEachCell(function(row, col) {
-        callback(text.charAt(i), row, col);
-        i++;
-    });
-  },
 
   forEachCell: function(callback) {
 
@@ -72,51 +58,8 @@ _Question.prototype = {
     }
   },
 
-  _validate: function(guess) {
-
-    if (guess.length != this._length) {
-      // TODO better error
-      return false;
-    }
-
-    var q = this;
-    var valid = true;
-
-    this.forEachChar(guess, function(c, row, col) {
-      var crossingChar = q._crossingCollection.charAt(row, col);
-      if (crossingChar && c != crossingChar) {
-        // TODO better error
-        valid = false;
-      }
-    });
-
-    return valid;
-  },
-
   length: function() {
     return this._length;
-  },
-
-  guess: function(text) {
-
-    if (text !== undefined) {
-      if (text == '') {
-        this._guess = text;
-
-      } else {
-        if (this._validate(text)) {
-          this._guess = text;
-          this._guesses.add(text);
-        } else {
-          this._guess = '';
-        }
-      }
-    }
-    return this._guess;
-  },
-
-  guesses: function() {
-    return this._guesses.get();
   },
 
   contains: function(row, col) {
@@ -126,17 +69,8 @@ _Question.prototype = {
       return this._col == col && row >= this._row && row <= this._row + this._length;
     }
   },
-
-  charAt: function(row, col) {
-
-    if (this._direction == 'across') {
-      var p = col - this._col;
-    } else {
-      var p = row - this._row;
-    }
-    return this._guess.charAt(p);
-  },
 };
+
 
 
 function _QuestionCollection(direction) {
@@ -145,7 +79,6 @@ function _QuestionCollection(direction) {
 
   // TODO validate direction
   this._direction = direction;
-  this._crossingCollection = null;
 }
 
 _QuestionCollection.prototype = {
@@ -162,12 +95,10 @@ _QuestionCollection.prototype = {
         this._max = row + length;
       }
     }
-    // TODO shoudn't be able to add if crossing collection is null
     // TODO validate that it doesn't overlap some other question?
     // TODO replace add with init and add in bulk?
 
-    var q = new _Question(number, clue, this._direction, row, col, length,
-                          this._crossingCollection);
+    var q = new _Question(number, clue, this._direction, row, col, length);
 
     this._questions[number] = q;
     return q;
@@ -185,23 +116,13 @@ _QuestionCollection.prototype = {
     // TODO catch index error
     return this._questions[idx];
   },
-
-  charAt: function(row, col) {
-    angular.forEach(this._questions, function(q) {
-      if (q.contains(row, col)) {
-        return q.charAt(row, col);
-      }
-    });
-  },
 };
+
 
 
 function Crossword() {
   this.across = new _QuestionCollection('across');
   this.down = new _QuestionCollection('down');
-
-  this.across._crossingCollection = this.down;
-  this.down._crossingCollection = this.across;
 }
 
 Crossword.prototype = {
