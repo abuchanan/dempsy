@@ -83,7 +83,7 @@ mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
     }
 
 
-    function _toggleDirection() {
+    function toggleDirection() {
       if (direction == 'across') {
         direction = 'down';
       } else {
@@ -92,18 +92,19 @@ mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
     }
 
     
-    this.cell = function(cell) {
+    this.cell = function(cell, specificDirection) {
+
       if (cell.empty()) {
         return;
       }
 
       if (cell === selected.cell) {
-        _toggleDirection();
+        toggleDirection();
       } else {
 
         _clearCell();
         _clearQuestions();
-        direction = 'across';
+        direction = specificDirection || 'across';
 
         selected.cell = cell;
         cell.selected = true;
@@ -120,8 +121,7 @@ mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
 
 
     this.question = function(question) {
-      this.cell(question.getCell(0));
-      direction = question.direction;
+      this.cell(question.getCell(0), question.direction);
     };
 
 
@@ -134,6 +134,16 @@ mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
         return direction + '-selected';
       }
       return '';
+    };
+
+    this.nextCell = function() {
+      var current = selected.cell;
+      if (current) {
+        var next = current.next[direction];
+        if (next) {
+          this.cell(next, direction);
+        }
+      }
     };
   }
 
@@ -149,11 +159,7 @@ mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
 
         $scope.$apply(function() {
           currentCell.content = c;
-          var nextCell = rows[currentCell.row][currentCell.col + 1];
-
-          if (nextCell && !nextCell.empty()) {
-            selectedManager.cell(nextCell);
-          }
+          selectedManager.nextCell();
         });
 
       } else {
@@ -170,11 +176,19 @@ mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
 
       for (var j = 0; j < width; j++) {
 
-        row.push({
+        var cell = {
           number: '',
           content: '',
           row: i,
           col: j,
+          next: {
+            across: false,
+            down: false,
+          },
+          prev: {
+            across: false,
+            down: false,
+          },
           questions: {
             across: false,
             down: false,
@@ -198,7 +212,23 @@ mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
             d[self.highlightDirection] = true;
             return d;
           },
-        });
+        };
+        row.push(cell);
+
+        // Link cells together. This comes in useful in SelectedManager
+        // when you want to select the next cell to the right, for example.
+        if (i > 0) {
+          var prevDown = rows[i - 1][j];
+          cell.prev.down = prevDown;
+          prevDown.next.down = cell;
+        }
+
+        if (j > 0) {
+          var prevAcross = rows[i][j - 1];
+          cell.prev.across = prevAcross;
+          prevAcross.next.across = cell;
+        }
+
       }
     }
   }
