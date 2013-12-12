@@ -1,5 +1,6 @@
 var connect = require('connect'),
     http = require('http'),
+    fs = require('fs'),
     io = require('socket.io');
 
 var app = connect()
@@ -9,12 +10,18 @@ var app = connect()
 var server = http.createServer(app)
 server.listen(8081);
 
+var crosswordDataPath = __dirname + '/app/crossword.json';
+
 // TODO weird
 io = io.listen(server);
 
 io.sockets.on('connection', function (socket) {
-  socket.emit('news', { hello: 'world' });
-  socket.on('my other event', function (data) {
-    console.log(data);
+  socket.on('load_crossword', function(ID, callback) {
+
+    fs.readFile(crosswordDataPath, 'utf8', function(err, data) {
+      data = JSON.parse(data);
+      callback(data);
+    });
+
   });
 });

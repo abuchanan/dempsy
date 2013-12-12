@@ -18,8 +18,6 @@
   <link rel="stylesheet" href="styles/bootstrap.css">
   <link rel="stylesheet" href="styles/main.css">
   <!-- endbuild -->
-
-  <script src='crossword.json'></script>
 </head>
 
 <body ng-app="dempsy">
@@ -54,13 +52,6 @@
     <script src="scripts/crossword.js"></script>
     <script src="scripts/app.js"></script>
     <script src='socket.io/socket.io.js'></script>
-<script>
-  var socket = io.connect('http://localhost');
-  socket.on('news', function (data) {
-    console.log(data);
-    socket.emit('my other event', { my: 'data' });
-  });
-</script>
     <!-- endbuild -->
 
 </body>

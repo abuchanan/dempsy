@@ -2,7 +2,7 @@
 
 var mod = angular.module('dempsy', [
   'dempsy.crossword',
-  'ngRoute'
+  'ngRoute',
   'btford.socket-io',
 ]);
 
@@ -18,26 +18,41 @@ mod.config(function ($routeProvider) {
     });
 });
 
-
-mod.service('CrosswordData', function() {
+mod.service('CrosswordData', function(socket, $q) {
   this.get = function() {
-    var crossword = new Crossword();
 
-    angular.forEach(crosswordData.across, function(a) {
-      crossword.across.add(a.number, a.clue, a.row, a.col, a.length);
-    });
+    var deferred = $q.defer();
 
-    angular.forEach(crosswordData.down, function(d) {
-      crossword.down.add(d.number, d.clue, d.row, d.col, d.length);
+    socket.emit('load_crossword', 'TODO', function(data) {
+
+      var crossword = new Crossword();
+
+      angular.forEach(data.across, function(a) {
+        crossword.across.add(a.number, a.clue, a.row, a.col, a.length);
+      });
+
+      angular.forEach(data.down, function(d) {
+        crossword.down.add(d.number, d.clue, d.row, d.col, d.length);
+      });
+
+      deferred.resolve(crossword);
+      
     });
-    return crossword;
+    return deferred.promise;
+
   };
 });
 
 
 mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
 
-  var crossword = CrosswordData.get();
+  var crosswordPromise = CrosswordData.get();
+  crosswordPromise.then(function(crossword) {
+    console.log(crossword);
+    initCells(crossword.across.max(), crossword.down.max());
+    angular.forEach(crossword.across.get(), addQuestion);
+    angular.forEach(crossword.down.get(), addQuestion);
+  });
 
 
   var rows = $scope.rows = [];
@@ -299,9 +314,6 @@ mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
     questions[wrapper.direction].push(wrapper);
   };
 
-  initCells(crossword.across.max(), crossword.down.max());
-  angular.forEach(crossword.across.get(), addQuestion);
-  angular.forEach(crossword.down.get(), addQuestion);
 
 
 });
