@@ -46,13 +46,27 @@ mod.service('CrosswordData', function(socket, $q) {
 
 mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
 
+  /* TODO
+   - somehow the crossword ID to be loaded must be defined. probably in $routeParams
+   - loading screen
+   - UI for starting a new crossword, or selecting from an existing instance.
+   - lots of error handling
+   - saving updates back to DB
+   - synchronizing updates coming from another player
+   - notify when other player is currently playing
+   - multiple guesses
+   - s/question/clue/
+   */
   var crosswordPromise = CrosswordData.get();
   crosswordPromise.then(function(crossword) {
-    console.log(crossword);
+    init(crossword);
+  });
+
+  function init(crossword) {
     initCells(crossword.across.max(), crossword.down.max());
     angular.forEach(crossword.across.get(), addQuestion);
     angular.forEach(crossword.down.get(), addQuestion);
-  });
+  }
 
 
   var rows = $scope.rows = [];
