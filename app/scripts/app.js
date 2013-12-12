@@ -1,7 +1,6 @@
 'use strict';
 
 var mod = angular.module('dempsy', [
-  'dempsy.crossword',
   'ngRoute',
   'btford.socket-io',
 ]);
@@ -18,64 +17,40 @@ mod.config(function ($routeProvider) {
     });
 });
 
-mod.service('CrosswordData', function(socket, $q) {
+mod.service('CrosswordData', function(socket, $q, Board) {
   this.get = function() {
 
     var deferred = $q.defer();
 
-    socket.emit('load_crossword', 'TODO', function(data) {
+    socket.emit('load crossword', 'TODO', function(data) {
 
-      var crossword = new Crossword();
-
-      angular.forEach(data.across, function(a) {
-        crossword.across.add(a.number, a.clue, a.row, a.col, a.length);
-      });
-
-      angular.forEach(data.down, function(d) {
-        crossword.down.add(d.number, d.clue, d.row, d.col, d.length);
-      });
-
-      deferred.resolve(crossword);
+      var board = Board.build(data.board.size, data.board.blocks, data.board.clues);
+      deferred.resolve(board);
       
     });
     return deferred.promise;
+  };
 
+  this.updateCell = function(row, col, content) {
+    // TODO notice update failures
+    var data = {
+      row: row,
+      col: col,
+      content: content,
+    };
+
+    socket.emit('update cell', data);
   };
 });
 
 
-mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
+mod.factory('CellSelector', function() {
 
-  /* TODO
-   - somehow the crossword ID to be loaded must be defined. probably in $routeParams
-   - loading screen
-   - UI for starting a new crossword, or selecting from an existing instance.
-   - lots of error handling
-   - saving updates back to DB
-   - synchronizing updates coming from another player
-   - notify when other player is currently playing
-   - multiple guesses
-   - s/question/clue/
-   */
-  var crosswordPromise = CrosswordData.get();
-  crosswordPromise.then(function(crossword) {
-    init(crossword);
-  });
-
-  function init(crossword) {
-    initCells(crossword.across.max(), crossword.down.max());
-    angular.forEach(crossword.across.get(), addQuestion);
-    angular.forEach(crossword.down.get(), addQuestion);
-  }
-
-
-  var rows = $scope.rows = [];
-
-  function SelectedManager() {
+  function Selector() {
 
     var selected = {
       cell: false,
-      questions: {
+      clues: {
         across: false,
         down: false,
       }
@@ -90,16 +65,16 @@ mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
         selected.cell = false;
     }
 
-    function _clearQuestions() {
-      var across = selected.questions.across;
-      selected.questions.across = false;
+    function _clearClues() {
+      var across = selected.clues.across;
+      selected.clues.across = false;
 
       if (across) {
         across.setHighlight(false);
       }
 
-      var down = selected.questions.down;
-      selected.questions.down = false;
+      var down = selected.clues.down;
+      selected.clues.down = false;
 
       if (down) {
         down.setHighlight(false);
@@ -107,9 +82,9 @@ mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
     }
 
 
-    function _question(question) {
-      selected.questions[question.direction] = question;
-      question.setHighlight(true);
+    function _clue(clue) {
+      selected.clues[clue.direction] = clue;
+      clue.setHighlight(true);
     }
 
 
@@ -124,7 +99,7 @@ mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
     
     this.cell = function(cell, specificDirection) {
 
-      if (cell.empty()) {
+      if (cell.isBlock()) {
         return;
       }
 
@@ -133,30 +108,35 @@ mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
       } else {
 
         _clearCell();
-        _clearQuestions();
+        _clearClues();
         direction = specificDirection || 'across';
 
         selected.cell = cell;
         cell.selected = true;
 
-        if (cell.questions.across) {
-          _question(cell.questions.across);
+        if (cell.clues.across) {
+          _clue(cell.clues.across);
         }
 
-        if (cell.questions.down) {
-          _question(cell.questions.down);
+        if (cell.clues.down) {
+          _clue(cell.clues.down);
         }
       }
     };
 
 
-    this.question = function(question) {
-      this.cell(question.getCell(0), question.direction);
+    this.clue = function(clue) {
+      this.cell(clue.cells[0], clue.direction);
     };
 
 
-    this.currentCell = function() {
-      return selected.cell;
+    this.position = function() {
+      // TODO
+      return {
+        row: 0,
+        col: 0,
+        cell: selected.cell,
+      }
     };
 
     this.directionClass = function() {
@@ -177,113 +157,71 @@ mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
     };
   }
 
-  var selectedManager = $scope.select = new SelectedManager();
+  return {
+    create: function(cells) {
+      return new Selector(cells);
+    }
+  }
+});
 
 
+mod.controller('MainCtrl', function ($scope, $document, CrosswordData, CellSelector) {
+
+  /* TODO
+   - somehow the crossword ID to be loaded must be defined. probably in $routeParams
+   - loading screen
+   - UI for starting a new crossword, or selecting from an existing instance.
+   - lots of error handling
+   - saving updates back to DB
+   - synchronizing updates coming from another player
+   - notify when other player is currently playing
+   -- player sessions
+   - multiple guesses
+   */
+  var crosswordPromise = CrosswordData.get();
+
+  crosswordPromise.then(function(board) {
+    $scope.cells = board.cells;
+    $scope.clues = board.clues;
+  });
+
+
+  var cellSelector = $scope.select = CellSelector.create();
+
+
+  // TODO this should be bound/unbound on selectedManager active/inactive events
   $document.keypress(function(event) {
-    var currentCell = selectedManager.currentCell();
+    var position = cellSelector.position();
 
-    if (currentCell) {
+    if (position) {
+
       if (event.which != 0 && event.charCode != 0) {
         var c = String.fromCharCode(event.which);
 
         $scope.$apply(function() {
-          currentCell.content = c;
-          selectedManager.nextCell();
+          position.cell.content = c;
+          //CrosswordData.updateCell(position.row, position.col, position.cell.content);
+          cellSelector.nextCell();
         });
 
       } else {
+        // TODO make use of arrow, ESC, delete, and space keys
       }
     }
   });
 
+});
 
-  function initCells(width, height) {
-    // Initialize all cells.
-    for (var i = 0; i < height; i++) {
-      var row = [];
-      rows.push(row);
 
-      for (var j = 0; j < width; j++) {
+mod.service('Clue', function() {
 
-        var cell = {
-          number: '',
-          content: '',
-          row: i,
-          col: j,
-          next: {
-            across: false,
-            down: false,
-          },
-          prev: {
-            across: false,
-            down: false,
-          },
-          questions: {
-            across: false,
-            down: false,
-          },
-          highlight: false,
-          highlightDirection: '',
-          selected: false,
-
-          empty: function() {
-            return !this.questions.across && !this.questions.down;
-          },
-
-          cssClass: function() {
-            var self = this;
-
-            var d = {
-              empty: self.empty(),
-              highlight: !self.selected && self.highlight,
-              selected: self.selected,
-            };
-            d[self.highlightDirection] = true;
-            return d;
-          },
-        };
-        row.push(cell);
-
-        // Link cells together. This comes in useful in SelectedManager
-        // when you want to select the next cell to the right, for example.
-        if (i > 0) {
-          var prevDown = rows[i - 1][j];
-          cell.prev.down = prevDown;
-          prevDown.next.down = cell;
-        }
-
-        if (j > 0) {
-          var prevAcross = rows[i][j - 1];
-          cell.prev.across = prevAcross;
-          prevAcross.next.across = cell;
-        }
-
-      }
-    }
-  }
-
-  var questions = $scope.questions = {
-    across: [],
-    down: [],
-  };
-
-  function addQuestion(question) {
-
-    // Create a wrapper around the question that is more specific
-    // to this controller.
-    var wrapper = {
-      question: question,
-      number: question.number,
-      clue: question.clue,
-      direction: question._direction,
+  this.create = function(text, direction) {
+    return {
+      text: text,
+      number: direction,
+      direction: direction,
+      cells: [],
       _highlighted: false,
-
-      forEachCell: function(callback) {
-        this.question.forEachCell(function(row, col) {
-          callback(rows[row][col]);
-        });
-      },
 
       cssClass: function() {
         var self = this;
@@ -302,32 +240,208 @@ mod.controller('MainCtrl', function ($scope, $document, CrosswordData) {
         val = Boolean(val);
         this._highlighted = val;
         var direction = this.direction;
-        this.forEachCell(function(cell) {
+
+        angular.forEach(this.cells, function(cell) {
           cell.highlight = val;
           cell.highlightDirection = direction;
         });
       },
-
-      getCell: function(idx) {
-        if (this.direction == 'across') {
-          return rows[this.question._row][this.question._col + idx];
-        } else {
-          return rows[this.question._row + idx][this.question._col];
-        }
-      },
-    };
-
-    // Link this question to each of its cells.
-    wrapper.forEachCell(function(cell) {
-      cell.questions[wrapper.direction] = wrapper;
-    });
-
-    // Set the cell number of the first cell in the question.
-    wrapper.getCell(0).number = wrapper.number;
-
-    questions[wrapper.direction].push(wrapper);
+    }
   };
+});
 
 
+mod.service('Cell', function() {
 
+  function _link(next, prev, direction) {
+    next.prev[direction] = prev;
+    prev.next[direction] = next;
+  }
+
+
+  this.create = function() {
+    return {
+      number: '',
+      content: '',
+      next: {
+        across: false,
+        down: false,
+      },
+      prev: {
+        across: false,
+        down: false,
+      },
+      clues: {
+        across: false,
+        down: false,
+      },
+
+      highlight: false,
+      highlightDirection: '',
+      selected: false,
+
+      isBlock: function() {
+        return !this.clues.across && !this.clues.down;
+      },
+
+      cssClass: function() {
+        var self = this;
+
+        var d = {
+          block: self.isBlock(),
+          highlight: !self.selected && self.highlight,
+          selected: self.selected,
+        };
+        d[self.highlightDirection] = true;
+        return d;
+      },
+      _link: function(other, direction) {
+        this.prev[direction] = other;
+        other.next[direction] = this;
+      },
+      linkDown: function(other) {
+        _link(this, other, 'down');
+      },
+      linkAcross: function(other) {
+        _link(this, other, 'across');
+      },
+    }
+  };
+});
+
+
+mod.service('Board', function(Cell, Clue) {
+
+  this.build = function(size, blocks, clues) {
+    // TODO define "block"
+    // TODO this wouldn't handle some unusual cases,
+    //      such as having a row that was flanked above and below by blocks.
+    //      e.g. (O's are cells, X's are blocks, Z is the cell in question
+    //      OOOXOOO
+    //      OOOZOOO
+    //      OOOXOOO
+    //      
+    //      I believe this would try to assign a "down" clue to cell Z.
+    //
+    //      Also, anything non-square isn't supported. document this.
+
+
+    // Transform raw clues (strings) into Clue instances.
+
+    for (var i = 0, ii = clues.across.length; i < ii; i++) {
+      clues.across[i] = Clue.create(clues.across[i], 'across');
+    }
+
+    for (var i = 0, ii = clues.down.length; i < ii; i++) {
+      clues.down[i] = Clue.create(clues.down[i], 'down');
+    }
+
+
+    // Index the blocks by [row, col] for easy lookups. 
+    var blocksIndex = {};
+
+    for (var i = 0, ii = blocks.length; i < ii; i++) {
+      var key = blocks[i];
+      blocksIndex[key] = true;
+    }
+
+
+    var clueNumber = 0;
+    var downIdx = -1;
+    var acrossIdx = -1;
+
+    var cells = [];
+
+    for (var rowIdx = 0; rowIdx < size; rowIdx++) {
+
+      var row = [];
+      cells.push(row);
+
+      for (var colIdx = 0; colIdx < size; colIdx++) {
+
+        var key = [rowIdx, colIdx];
+        var isBlock = blocksIndex[key]
+
+        var cell = Cell.create();
+        row.push(cell);
+
+        if (!isBlock) {
+
+          /* 
+            These are cases where this cell starts a new "down" clue:
+
+            - If this is the first row.
+            - If the cell above this one is a "block".
+          */
+          var cellAboveKey = [rowIdx - 1, colIdx];
+          var isDownStart = rowIdx == 0 || blocksIndex[cellAboveKey];
+
+
+          /*
+            These are cases where this cell starts a new "across" clue:
+
+            - If this is the first column.
+            - If the cell to the left is a "block".
+          */
+          var cellLeftKey = [rowIdx, colIdx - 1]
+          var isAcrossStart = colIdx == 0 || blocksIndex[cellLeftKey];
+
+
+          // Link cells together. This comes in useful in SelectedManager
+          // when you want to select the next cell to the right, for example.
+          if (rowIdx > 0) {
+            cell.linkDown(cells[rowIdx - 1][colIdx]);
+          }
+
+          if (colIdx > 0) {
+            cell.linkAcross(cells[rowIdx][colIdx - 1]);
+          }
+
+
+          // If this cell starts a new clue, increment the clue number,
+          // increment the clue index number, set the clue's number
+          // set the cell number, and link the clue to the cell.
+
+          if (isDownStart || isAcrossStart) {
+            clueNumber += 1;
+            cell.number = clueNumber;
+          }
+
+          if (isDownStart) {
+            downIdx += 1;
+            var clue = clues.down[downIdx]
+            clue.number = clueNumber;
+            clue.start = cell;
+            clue.cells.push(cell);
+            cell.clues.down = clue;
+          }
+
+          if (isAcrossStart) {
+            acrossIdx += 1;
+            var clue = clues.across[acrossIdx]
+            clue.number = clueNumber;
+            clue.cells.push(cell);
+            cell.clues.across = clue;
+          }
+
+          if (cell.prev.across && cell.prev.across.clues.across) {
+            var prevAcross = cell.prev.across.clues.across;
+            prevAcross.cells.push(cell);
+            cell.clues.across = prevAcross;
+          }
+
+          if (cell.prev.down && cell.prev.down.clues.down) {
+            var prevDown = cell.prev.down.clues.down;
+            prevDown.cells.push(cell);
+            cell.clues.down = prevDown;
+          }
+        }
+      }
+    }
+
+    return {
+      cells: cells,
+      clues: clues,
+    }
+  };
 });

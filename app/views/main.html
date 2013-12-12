@@ -3,7 +3,7 @@
   <div class='col-md-6'>
     <table>
       <tbody>
-        <tr ng-repeat='row in rows track by $index'>
+        <tr ng-repeat='row in cells track by $index'>
           <td class='crossword-cell'
               ng-repeat='cell in row track by $index'
               ng-class='cell.cssClass()'
@@ -18,10 +18,10 @@
     <h3>Across</h3>
     <ul class='list-unstyled'>
       <li class='clue'
-          ng-repeat='q in questions.across | orderBy:number'
-          ng-class='q.cssClass()'
-          ng-click='select.question(q)'>
-        <span class='clue-number'>{{ q.number }}</span> {{ q.clue }}
+          ng-repeat='clue in clues.across | orderBy:number'
+          ng-class='clue.cssClass()'
+          ng-click='select.clue(clue)'>
+        <span class='clue-number'>{{ clue.number }}</span> {{ clue.text }}
       </li>
     </ul>
   </div>
@@ -30,10 +30,10 @@
     <h3>Down</h3>
     <ul class='list-unstyled'>
       <li class='clue'
-          ng-repeat='q in questions.down | orderBy:number'
-          ng-class='q.cssClass()'
-          ng-click='select.question(q)'>
-        <span class='clue-number'>{{ q.number }}</span> {{ q.clue }}
+          ng-repeat='clue in clues.down | orderBy:number'
+          ng-class='clue.cssClass()'
+          ng-click='select.clue(clue)'>
+        <span class='clue-number'>{{ clue.number }}</span> {{ clue.text }}
       </li>
     </ul>
   </div>

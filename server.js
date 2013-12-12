@@ -10,18 +10,25 @@ var app = connect()
 var server = http.createServer(app)
 server.listen(8081);
 
-var crosswordDataPath = __dirname + '/app/crossword.json';
+var crosswordDataPath = __dirname + '/app/crossword2.json';
+var currentGameData = [];
 
 // TODO weird
 io = io.listen(server);
 
+var current_data = {};
+
 io.sockets.on('connection', function (socket) {
-  socket.on('load_crossword', function(ID, callback) {
+  socket.on('load crossword', function(ID, callback) {
 
     fs.readFile(crosswordDataPath, 'utf8', function(err, data) {
       data = JSON.parse(data);
       callback(data);
     });
 
+  });
+
+  socket.on('update cell', function(cell) {
+    console.log(cell);
   });
 });

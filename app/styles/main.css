@@ -40,7 +40,7 @@ body {
   text-align: center;
 }
 
-.crossword-cell.empty {
+.crossword-cell.block {
   background-color: black;
 }
 
