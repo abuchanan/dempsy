@@ -3,6 +3,7 @@
 var mod = angular.module('dempsy', [
   'dempsy.crossword',
   'ngRoute'
+  'btford.socket-io',
 ]);
 
 
