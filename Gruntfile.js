@@ -2,7 +2,7 @@
 
 module.exports = function (grunt) {
 
-  require('time-grunt')(grunt);
+  //require('time-grunt')(grunt);
 
   var TASK_DIR = './tasks/';
 
@@ -12,6 +12,23 @@ module.exports = function (grunt) {
       app: 'app',
       dist: 'dist'
     },
+    karma: {
+      unit: {
+        configFile: 'karma.conf.js',
+        //background: true,
+      }
+    },
+    watch: {
+      karma: {
+        files: [
+          'app/scripts/*.js',
+          'app/scripts/**/*.js',
+          'test/spec/*.js',
+          'test/spec/**/*.js',
+         ],
+        tasks: ['karma:unit:run'],
+      }
+    }
   };
 
   // TODO TaskLoader, allows default config and tasks
@@ -37,10 +54,12 @@ module.exports = function (grunt) {
     Object.keys(toLoad).forEach(function(name) {
       grunt.loadNpmTasks(name);
     });
-
     // TODO initConfig or return config object?
-    grunt.initConfig(config);
   }
+
+  grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-karma');
+  grunt.initConfig(config);
 
   grunt.registerTask('server', function () {
 
@@ -59,13 +78,14 @@ module.exports = function (grunt) {
   });
 
 
-  grunt.registerTask('test', function() {
+  grunt.registerTask('karmafoo', function() {
 
-    loadTasks(['karma', 'watch']);
-
+    loadTasks(['karma']);
+    console.log(arguments);
+    /*
     grunt.task.run([
-      'karma:unit',
-      'watch:karma',
+      'karma:unit:start',
     ]);
+    */
   });
 };
