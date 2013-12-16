@@ -88,13 +88,8 @@ mod.factory('CellSelector', function() {
     };
 
 
-    this.position = function() {
-      // TODO
-      return {
-        row: 0,
-        col: 0,
-        cell: selected.cell,
-      }
+    this.current = function() {
+      return selected.cell;
     };
 
     this.directionClass = function() {

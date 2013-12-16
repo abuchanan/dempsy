@@ -47,7 +47,10 @@ mod.controller('CrosswordCtrl', function ($scope, $routeParams, CrosswordData,
   var id = $routeParams.id;
   var crosswordPromise = CrosswordData.get(id);
 
-  crosswordPromise.then(function(board) {
+  var board;
+
+  crosswordPromise.then(function(_board) {
+    board = _board;
     $scope.cells = board.cells;
     $scope.clues = board.clues;
   });
@@ -55,10 +58,9 @@ mod.controller('CrosswordCtrl', function ($scope, $routeParams, CrosswordData,
   var cellSelector = $scope.select = CellSelector.create();
 
   Editor.on('update', function(event, c) {
-    var position = cellSelector.position();
-    if (position) {
-      position.cell.content = c;
-      CrosswordData.updateCell(position.row, position.col, position.cell.content);
+    var cell = cellSelector.current();
+    if (cell) {
+      cell.content(c);
       cellSelector.nextCell();
     }
   });

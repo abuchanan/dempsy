@@ -2,7 +2,7 @@
 
 var mod = angular.module('dempsy.cell', []);
 
-mod.service('Cell', function() {
+mod.service('Cell', function($rootScope) {
 
   function _link(next, prev, direction) {
     next.prev[direction] = prev;
@@ -10,10 +10,25 @@ mod.service('Cell', function() {
   }
 
 
-  this.create = function() {
+  this.create = function(row, col) {
+
+    var scope = $rootScope.$new(true);
+    var _content = '';
+
     return {
+      row: row,
+      col: col,
       number: '',
-      content: '',
+      on: function() {
+        scope.$on.apply(scope, arguments);
+      },
+      content: function(c) {
+        if (c !== undefined) {
+          _content = c;
+          scope.$broadcast('update', this);
+        }
+        return _content;
+      },
       next: {
         across: false,
         down: false,

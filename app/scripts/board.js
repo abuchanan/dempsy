@@ -3,9 +3,16 @@
 var mod = angular.module('dempsy.board', []);
 
 
-mod.service('Board', function(Cell, Clue) {
+mod.service('Board', function(Cell, Clue, $rootScope) {
 
-  this.build = function(size, blocks, clues) {
+  this.build = function(size, blocks, clues, content) {
+
+    var scope = $rootScope.$new(true);
+
+    function handleCellUpdate(event, cell) {
+      scope.$broadcast('update cell', cell);
+    }
+
     // TODO define "block"
     // TODO this wouldn't handle some unusual cases,
     //      such as having a row that was flanked above and below by blocks.
@@ -55,8 +62,15 @@ mod.service('Board', function(Cell, Clue) {
         var key = [rowIdx, colIdx];
         var isBlock = blocksIndex[key]
 
-        var cell = Cell.create();
+        var cell = Cell.create(rowIdx, colIdx);
         row.push(cell);
+
+        cell.on('update', handleCellUpdate);
+
+        var cellContent = content[key];
+        if (cellContent !== undefined) {
+          cell.content(cellContent);
+        }
 
         if (!isBlock) {
 
@@ -135,6 +149,9 @@ mod.service('Board', function(Cell, Clue) {
     return {
       cells: cells,
       clues: clues,
+      on: function() {
+        scope.$on.apply(scope, arguments);
+      },
     }
   };
 });
