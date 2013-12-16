@@ -54,7 +54,7 @@ mod.controller('CrosswordCtrl', function ($scope, $routeParams, CrosswordData,
 
   var cellSelector = $scope.select = CellSelector.create();
 
-  Editor.on('update', function(c) {
+  Editor.on('update', function(event, c) {
     var position = cellSelector.position();
     if (position) {
       position.cell.content = c;
