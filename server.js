@@ -20,10 +20,8 @@ var gameData = {
   },
 };
 
-// TODO weird
-io = io.listen(server);
+io.listen(server).sockets.on('connection', function (socket) {
 
-io.sockets.on('connection', function (socket) {
   socket.on('load crossword', function(ID, callback) {
 
     fs.readFile(crosswordDataPath, 'utf8', function(err, data) {
@@ -35,8 +33,8 @@ io.sockets.on('connection', function (socket) {
   });
 
   socket.on('update cell', function(data) {
+    // TODO delete if content is empty?
     console.log(data);
-    var key = [data.row, data.col];
-    gameData.games[data.board].content[key] = data.content;
+    gameData.games[data.board_ID].content[data.cell_ID] = data.content;
   });
 });
