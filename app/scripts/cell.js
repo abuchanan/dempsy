@@ -22,10 +22,17 @@ mod.service('Cell', function($rootScope) {
       on: function() {
         scope.$on.apply(scope, arguments);
       },
-      content: function(c) {
-        if (c !== undefined) {
+      content: function(c, broadcast) {
+        if (broadcast === undefined) {
+          broadcast = true;
+        }
+
+        if (c !== undefined && _content != c) {
           _content = c;
-          scope.$broadcast('update', this);
+          if (broadcast) {
+            console.log('Cell#content() broadcast', broadcast);
+            scope.$broadcast('update', this);
+          }
         }
         return _content;
       },

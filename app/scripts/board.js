@@ -69,7 +69,7 @@ mod.service('Board', function(Cell, Clue, $rootScope) {
 
         var cellContent = content[key];
         if (cellContent !== undefined) {
-          cell.content(cellContent);
+          cell.content(cellContent, false);
         }
 
         if (!isBlock) {

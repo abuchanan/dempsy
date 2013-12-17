@@ -38,7 +38,6 @@ mod.controller('CrosswordCtrl', function ($scope, $routeParams, CrosswordData,
   /* TODO
    - loading screen
    - lots of error handling
-   - saving updates back to DB
    - synchronizing updates coming from another player
    - notify when other player is currently playing
    -- player sessions

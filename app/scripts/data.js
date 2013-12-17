@@ -22,6 +22,13 @@ mod.service('CrosswordData', function(socket, $q, Board) {
         });
       });
 
+      socket.on('cell updated', function(data) {
+        console.log('cell updated', data);
+        var row = data.cell_ID[0];
+        var col = data.cell_ID[1];
+        board.cells[row][col].content(data.content, false);
+      });
+
       deferred.resolve(board);
     });
     return deferred.promise;
