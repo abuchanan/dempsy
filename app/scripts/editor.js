@@ -12,8 +12,27 @@ mod.service('Editor', function($document, $rootScope) {
     return altModified || ctrlModified || metaModified || shiftModified;
   }
 
+  var map = {
+    37: 'left',
+    38: 'up',
+    39: 'right',
+    40: 'down',
+    8: 'backspace',
+  }
+
+  $document.keydown(function(event) {
+    var code = map[event.keyCode];
+    if (code) {
+      scope.$apply(function() {
+        event.preventDefault();
+        scope.$broadcast(code);
+      });
+    }
+  });
+
   // TODO this should be bound/unbound on selectedManager active/inactive events
   $document.keypress(function(event) {
+
     // If the user is holding a modifier key (ctrl, shift, etc)
     // don't accept character input.
     if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;

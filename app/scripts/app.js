@@ -57,9 +57,40 @@ mod.controller('CrosswordCtrl', function ($scope, $routeParams, CrosswordData,
 
   Editor.on('update', function(event, c) {
     var cell = cellSelector.current();
+    // TODO shouldn't have to check if (cell)
+    //      if we're getting this event, a cell should be selected.
     if (cell) {
       cell.content(c);
       cellSelector.nextCell();
     }
   });
+
+  Editor.on('left', function() {
+    cellSelector.setDirection('across');
+    cellSelector.prevCell();
+  });
+
+  Editor.on('right', function() {
+    cellSelector.setDirection('across');
+    cellSelector.nextCell();
+  });
+
+  Editor.on('up', function() {
+    cellSelector.setDirection('down');
+    cellSelector.prevCell();
+  });
+
+  Editor.on('down', function() {
+    cellSelector.setDirection('down');
+    cellSelector.nextCell();
+  });
+
+  Editor.on('backspace', function() {
+    var cell = cellSelector.current();
+    if (cell) {
+      cell.content('');
+      cellSelector.prevCell();
+    }
+  });
+
 });

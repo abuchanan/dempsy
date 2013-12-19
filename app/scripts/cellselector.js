@@ -99,6 +99,20 @@ mod.factory('CellSelector', function() {
       return '';
     };
 
+    this.setDirection = function(_direction) {
+      direction = _direction;
+    }
+
+    this.prevCell = function() {
+      var current = selected.cell;
+      if (current) {
+        var prev = current.prev[direction];
+        if (prev) {
+          this.cell(prev, direction);
+        }
+      }
+    };
+
     this.nextCell = function() {
       var current = selected.cell;
       if (current) {
