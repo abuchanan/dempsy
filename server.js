@@ -10,44 +10,56 @@ var app = connect()
 var server = http.createServer(app)
 server.listen(8081);
 
-var crosswordDataPath = __dirname + '/app/crossword2.json';
 
-var gamesData = {
-  games: {
-    todo: {
-      content: {},
-    },
-    foo: {
-      content: {},
-    },
-  },
-};
+var mongo = require('mongodb');
 
-io.listen(server).sockets.on('connection', function (socket) {
+var mongoUri = process.env.MONGOLAB_URI ||
+               process.env.MONGOHQ_URL ||
+               'mongodb://localhost/dempsy1';
 
-  socket.on('load crossword', function(ID, callback) {
-    socket.join('crossword-room-' + ID);
+mongo.MongoClient.connect(mongoUri, function (err, db) {
+  if (err) throw err;
 
-    // TODO handle bad game ID
+  var games = db.collection('games');
+  var boards = db.collection('boards');
 
-    fs.readFile(crosswordDataPath, 'utf8', function(err, data) {
-      data = JSON.parse(data);
-      data.content = gamesData.games[ID].content;
-      callback(data);
+  io.listen(server).sockets.on('connection', function (socket) {
+
+    socket.on('load game', function(ID, callback) {
+      socket.join('crossword-room-' + ID);
+
+      // TODO handle bad game ID
+      var gameObjID = new mongo.ObjectID(ID);
+
+      games.findOne({'_id': gameObjID}, function(err, game) {
+        
+        var boardObjID = new mongo.ObjectID(game.board_id);
+
+        boards.findOne({'_id': boardObjID}, function(err, board) {
+          callback({
+            board: board,
+            content: game.content,
+          });
+        });
+      });
     });
 
-  });
+    socket.on('update cell', function(data) {
 
-  socket.on('update cell', function(data) {
-    // TODO delete if content is empty?
-    console.log('update cell', data);
-    gamesData.games[data.board_ID].content[data.cell_ID] = data.content;
+      // TODO delete if content is empty?
+      console.log('update cell', data);
 
-    socket.broadcast.to('crossword-room-' + data.board_ID).emit('cell updated', {
-    //socket.broadcast.emit('cell updated', {
-      cell_ID: data.cell_ID,
-      content: data.content,
+      games.findOne({'_id': data.game_ID}, function(doc) {
+        doc.content[data.cell_ID] = data.content;
+        games.save(doc);
+
+        socket.broadcast.to('crossword-room-' + data.game_ID)
+          .emit('cell updated', {
+            cell_ID: data.cell_ID,
+            content: data.content,
+          });
+      });
+
     });
-
   });
 });

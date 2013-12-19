@@ -9,14 +9,14 @@ mod.service('CrosswordData', function(socket, $q, Board) {
 
     var deferred = $q.defer();
 
-    socket.emit('load crossword', id, function(data) {
+    socket.emit('load game', id, function(data) {
 
       var board = Board.build(data.board.size, data.board.blocks,
                               data.board.clues, data.content);
 
       board.on('update cell', function(event, cell) {
         socket.emit('update cell', {
-          board_ID: id,
+          game_ID: id,
           cell_ID: [cell.row, cell.col],
           content: cell.content(),
         });
