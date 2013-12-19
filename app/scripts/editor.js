@@ -42,11 +42,10 @@ mod.service('Editor', function($document, $rootScope) {
       scope.$apply(function() {
         scope.$broadcast('update', c);
       });
-    } else {
-      // TODO make use of arrow, ESC, delete, and space keys
     }
   });
 
+  // Public API
   return {
     on: function() {
       scope.$on.apply(scope, arguments);
