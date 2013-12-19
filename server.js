@@ -49,15 +49,25 @@ mongo.MongoClient.connect(mongoUri, function (err, db) {
       // TODO delete if content is empty?
       console.log('update cell', data);
 
-      games.findOne({'_id': data.game_ID}, function(doc) {
-        doc.content[data.cell_ID] = data.content;
-        games.save(doc);
+      var query = {'_id': new mongo.ObjectID(data.game_ID)};
 
-        socket.broadcast.to('crossword-room-' + data.game_ID)
-          .emit('cell updated', {
-            cell_ID: data.cell_ID,
-            content: data.content,
-          });
+      games.findOne(query, function(err, game) {
+
+        game.content[data.cell_ID] = data.content;
+
+        games.save(game, function(err) {
+          // TODO this would kill the server
+          //      we should be able to transparently retry
+          //      or at least send an error to the client
+          if (err) throw err;
+
+          socket.broadcast.to('crossword-room-' + data.game_ID)
+            .emit('cell updated', {
+              cell_ID: data.cell_ID,
+              content: data.content,
+            });
+
+        });
       });
 
     });
