@@ -6,10 +6,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/abuchanan/dempsy.git",
+    "url": "https://github.com/abuchanan/dempsy.git"
   },
   "bugs": {
-    "url": "https://github.com/abuchanan/dempsy/issues",
+    "url": "https://github.com/abuchanan/dempsy/issues"
+  },
+  "engines": {
+    "node": "0.10.x"
   },
   "dependencies": {
     "connect": "~2.12.0",
