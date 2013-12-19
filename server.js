@@ -7,8 +7,10 @@ var app = connect()
   .use(connect.logger('dev'))
   .use(connect.static('app'));
 
+var port = process.env.PORT || 8081;
+
 var server = http.createServer(app)
-server.listen(8081);
+server.listen(port);
 
 
 var mongo = require('mongodb');
