@@ -105,7 +105,6 @@ body {
 }
 
 .clue-number {
-  font-weight: bold;
   display: inline-block;
   width: 20px;
   text-align: right;
@@ -114,4 +113,5 @@ body {
 
 .clue.complete {
   text-decoration: line-through;
+  color: #ddd;
 }
