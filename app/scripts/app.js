@@ -32,16 +32,53 @@ mod.controller('MainCtrl', function($scope) {
    // TODO UI for starting a new crossword, or selecting from an existing instance.
 });
 
+mod.directive('loading', function($timeout) {
+  return {
+    scope: {
+      loading: '=',
+    },
+    template: '<div>Loading{{ extra }}</div>',
+    link: function($scope) {
+      var fun = [
+        'yup, still loading',
+        'sigh',
+        "how you doin'?",
+        "how 'bout that weather, eh?",
+        'burp',
+        'sssoooooo',
+        'awkward turtle',
+        'any second now',
+        'patience is a virtue',
+      ];
+
+      var ticks = 0;
+      // TODO configurable
+      var interval = 1000;
+      $scope.extra = '';
+
+      function tick() {
+        ticks += 1;
+        if (ticks % 5 == 0 && fun.length > 0) {
+          var idx = Math.floor(Math.random() * fun.length);
+          var item = fun.splice(idx, 1);
+          $scope.extra += item;
+        } else {
+          $scope.extra += '.';
+        }
+        if ($scope.loading) {
+          $timeout(tick, interval);
+        }
+      }
+      tick();
+    },
+  }
+});
+
 mod.controller('CrosswordCtrl', function ($scope, $routeParams, CrosswordData,
                                           CellSelector, Editor) {
 
-  /* TODO
-   - loading screen
-   - lots of error handling
-   - notify when other player is currently playing
-   -- player sessions
-   - multiple guesses
-   */
+  $scope.loading = true;
+
   var id = $routeParams.id;
   var crosswordPromise = CrosswordData.get(id);
 
@@ -53,6 +90,7 @@ mod.controller('CrosswordCtrl', function ($scope, $routeParams, CrosswordData,
     $scope.cells = board.cells;
     $scope.clues = board.clues;
     cellSelector.cell($scope.cells[0][0]);
+    $scope.loading = false;
   });
 
 

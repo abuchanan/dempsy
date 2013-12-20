@@ -7,7 +7,6 @@
 - crossword maker/editor
 - better style to show update from remote player
 - show when remote player is online
-- loading screen
 - chat?
 - other development stuff (tests, etc)
 - answer checking
