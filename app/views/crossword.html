@@ -8,7 +8,9 @@
               ng-repeat='cell in row track by $index'
               ng-class='cell.cssClass()'
               ng-click='select.cell(cell)'>
-            <span class='cell-number' ng-show='!cell.empty()'>{{ cell.number }}</span> {{ cell.content() }}</td>
+            <div class='cell-number' ng-show='!cell.empty()'>{{ cell.number }}</div>
+            <div class='cell-content'>{{ cell.content() }}</div>
+          </td>
         </tr>
       </tbody>
     </table>

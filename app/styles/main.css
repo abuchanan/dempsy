@@ -34,36 +34,58 @@ body {
 
 
 .crossword-cell {
-  height: 35px;
-  width: 35px;
-  border: 1px solid black;
+  height: 40px;
+  width: 40px;
+  border: 1px solid #cfcfcf;
   text-align: center;
+  background-color: #e8e8e8;
+  font-weight: bold;
+  padding: 0;
 }
 
 .crossword-cell.block {
-  background-color: black;
+  background-color: #474747;
+  border: 1px solid #474747;
 }
 
 .across-selected .crossword-cell.highlight.across,
 .down-selected .crossword-cell.highlight.down {
-  background-color: #D9EDF7 !important;
+  background-color: white;
+  /*background-color: #D9EDF7 !important;*/
+  /* background-color: #9BD8ED !important; */
 }
 
 .across-selected .crossword-cell.highlight.down,
 .down-selected .crossword-cell.highlight.across {
+
   /* background-color: #FCF8E3; */
-  background-color: #eee;
+  /* background-color: #eee; */
 }
 
 .crossword-cell .cell-number {
+/*
   position: relative;
   top: -12px;
   left: -8px;
-  font-size: 0.6em;
+  */
+  height: 10px;
+  line-height: 9px;
+  font-size: 9px;
+  padding-left: 3px;
+  color: #676767;
+  text-align: left;
+}
+
+.crossword-cell .cell-content {
+  font-size: 17px;
+  height: 25px;
+  line-height: 25px;
 }
 
 .crossword-cell.selected {
-  background-color: #5BC0DE;
+  /* background-color: #5B9fde; */
+  background-color: white;
+  box-shadow: 0 0 8px rgba(82, 168, 236, 0.75);
 }
 
 .clue {
@@ -72,7 +94,9 @@ body {
 
 .across-selected .clue.highlight.across,
 .down-selected .clue.highlight.down {
-  background-color: #D9EDF7 !important;
+  /* background-color: #9BD8ED !important; */
+  /* background-color: #D9EDF7 !important;*/
+  box-shadow: 0 0 8px rgba(82, 168, 236, 0.75);
 }
 
 .across-selected .clue.highlight.down,

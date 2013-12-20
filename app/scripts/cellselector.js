@@ -55,6 +55,7 @@ mod.factory('CellSelector', function() {
     }
 
     
+    // TODO selectCell would be nicer
     this.cell = function(cell, specificDirection) {
 
       if (cell.isBlock()) {

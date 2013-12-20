@@ -4,6 +4,8 @@
 - intelligently select direction when clicking on cell. if cell is the start of a down clue, select the down direction.
 - highlighted clue jumps around while typing out an answer
 
+- themes
+
 - multiple guesses to be saved per clue
 - multiple games to be started
 - crossword maker/editor

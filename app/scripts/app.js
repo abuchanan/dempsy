@@ -46,14 +46,15 @@ mod.controller('CrosswordCtrl', function ($scope, $routeParams, CrosswordData,
   var crosswordPromise = CrosswordData.get(id);
 
   var board;
+  var cellSelector = $scope.select = CellSelector.create();
 
   crosswordPromise.then(function(_board) {
     board = _board;
     $scope.cells = board.cells;
     $scope.clues = board.clues;
+    cellSelector.cell($scope.cells[0][0]);
   });
 
-  var cellSelector = $scope.select = CellSelector.create();
 
   Editor.on('update', function(event, c) {
     var cell = cellSelector.current();
