@@ -7,11 +7,6 @@ mod.service('Editor', function($document, $rootScope) {
 
   var scope = $rootScope.$new(true);
 
-  function modified() {
-    console.log(altModified, ctrlModified, metaModified, shiftModified);
-    return altModified || ctrlModified || metaModified || shiftModified;
-  }
-
   var map = {
     37: 'left',
     38: 'up',
@@ -35,7 +30,7 @@ mod.service('Editor', function($document, $rootScope) {
 
     // If the user is holding a modifier key (ctrl, shift, etc)
     // don't accept character input.
-    if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
 
     if (event.which != 0 && event.charCode != 0) {
       var c = String.fromCharCode(event.which);
