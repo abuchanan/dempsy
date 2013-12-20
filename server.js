@@ -37,7 +37,12 @@ mongo.MongoClient.connect(mongoUri, function (err, db) {
 
       games.findOne({'_id': gameObjID}, function(err, game) {
         
-        var boardObjID = new mongo.ObjectID(game.board_id);
+        // TODO clean this up. 
+        if (game.board_id instanceof String) {
+          var boardObjID = new mongo.ObjectID(game.board_id);
+        } else {
+          var boardObjID = game.board_id;
+        }
 
         boards.findOne({'_id': boardObjID}, function(err, board) {
           callback({
