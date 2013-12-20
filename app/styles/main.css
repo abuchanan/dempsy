@@ -87,3 +87,7 @@ body {
   text-align: right;
   margin-right: 10px;
 }
+
+.clue.complete {
+  text-decoration: line-through;
+}

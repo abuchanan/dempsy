@@ -14,8 +14,19 @@ mod.service('Clue', function() {
 
       cssClass: function() {
         var self = this;
+
+        // If the clue has all its cells filled,
+        // give it the "complete" class.
+        var complete = true;
+        angular.forEach(self.cells, function(cell) {
+          if (!cell.content()) {
+            complete = false;
+          }
+        });
+
         var d = {
           highlight: self._highlighted,
+          complete: complete,
         }
         d[self.direction] = true;
         return d
