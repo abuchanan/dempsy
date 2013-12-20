@@ -1,6 +1,5 @@
 - undo, with button and ctrl-z support
 - spacebar switches direction (or some shortcut)
-- intelligently select direction when clicking on cell. if cell is the start of a down clue, select the down direction.
 - themes
 - multiple guesses to be saved per clue
 - multiple games to be started

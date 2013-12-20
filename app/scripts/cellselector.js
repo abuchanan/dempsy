@@ -68,7 +68,16 @@ mod.factory('CellSelector', function() {
 
         _clearCell();
         _clearClues();
-        direction = specificDirection || 'across';
+
+        console.log(cell.startsAcross(), cell.startsDown());
+        console.log(cell.prev);
+        if (!cell.startsAcross() && cell.startsDown()) {
+          var defaultDirection = 'down';
+        } else {
+          var defaultDirection = 'across';
+        }
+
+        direction = specificDirection || defaultDirection;
 
         selected.cell = cell;
         cell.selected = true;

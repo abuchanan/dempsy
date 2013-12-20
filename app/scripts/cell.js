@@ -49,6 +49,13 @@ mod.service('Cell', function($rootScope) {
         down: false,
       },
 
+      startsAcross: function() {
+        return this.clues.across.cells[0] === this;;
+      },
+      startsDown: function() {
+        return this.clues.down.cells[0] === this;;
+      },
+
       highlight: false,
       highlightDirection: '',
       selected: false,
