@@ -9,3 +9,7 @@
 - other development stuff (tests, etc)
 - answer checking
 - score crosswords and keep a history of how you've done overall
+- arrow keys should skip over block cells
+- crossword board should remain fixed while scrolling clues, or clues should have their own scrollbars
+- one-liner dev step
+- mock for mongodb
