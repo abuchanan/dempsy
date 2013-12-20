@@ -1,11 +1,11 @@
 - undo, with button and ctrl-z support
-- spacebar switches direction (or some shortcut)
 - themes
 - multiple guesses to be saved per clue
 - multiple games to be started
 - crossword maker/editor
 - better style to show update from remote player
-- show when remote player is online
+- allow player name and show remote player name
 - chat?
 - other development stuff (tests, etc)
 - answer checking
+- score crosswords and keep a history of how you've done overall

@@ -82,14 +82,13 @@ mod.controller('CrosswordCtrl', function ($scope, $routeParams, CrosswordData,
   var id = $routeParams.id;
   var crosswordPromise = CrosswordData.get(id);
 
-  var board;
   var cellSelector = $scope.select = CellSelector.create();
 
-  crosswordPromise.then(function(_board) {
-    board = _board;
-    $scope.cells = board.cells;
-    $scope.clues = board.clues;
-    cellSelector.cell($scope.cells[0][0]);
+  crosswordPromise.then(function(game) {
+    $scope.cells = game.board.cells;
+    $scope.clues = game.board.clues;
+    $scope.room = game.room;
+    cellSelector.cell(game.board.cells[0][0]);
     $scope.loading = false;
   });
 

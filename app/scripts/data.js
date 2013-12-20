@@ -3,7 +3,7 @@
 var mod = angular.module('dempsy.data', []);
 
 
-mod.service('CrosswordData', function(socket, $q, Board) {
+mod.service('CrosswordData', function(socket, $q, Board, $timeout) {
 
   this.get = function(id) {
 
@@ -29,7 +29,28 @@ mod.service('CrosswordData', function(socket, $q, Board) {
         board.cells[row][col].content(data.content, false);
       });
 
-      deferred.resolve(board);
+      var room = {
+        clients: [],
+      };
+      // In milliseconds
+      var roomUpdateInterval = 10 * 1000;
+
+      // TODO should this really do polling? Maybe it should just wait for
+      //      join/leave broadcast events? What if those are dropped?
+      //      Should the server do the polling?
+      function list_clients() {
+        socket.emit('list clients', id, function(data) {
+          room.clients = data;
+        });
+        $timeout(list_clients, roomUpdateInterval);
+      }
+      list_clients();
+
+
+      deferred.resolve({
+        board: board,
+        room: room,
+      });
     });
     return deferred.promise;
   };

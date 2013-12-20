@@ -25,7 +25,9 @@ mongo.MongoClient.connect(mongoUri, function (err, db) {
   var games = db.collection('games');
   var boards = db.collection('boards');
 
-  io.listen(server).sockets.on('connection', function (socket) {
+  var sockets = io.listen(server).sockets;
+
+  sockets.on('connection', function (socket) {
 
     socket.on('load game', function(ID, callback) {
       socket.join('crossword-room-' + ID);
@@ -44,6 +46,22 @@ mongo.MongoClient.connect(mongoUri, function (err, db) {
           });
         });
       });
+    });
+
+    socket.on('list clients', function(ID, callback) {
+      var clientSockets = sockets.clients('crossword-room-' + ID);
+      var clientIds = [];
+      for (var i = 0, ii = clientSockets.length; i < ii; i++) {
+        var clientId = clientSockets[i].id;
+
+        if (clientId != socket.id) {
+          clientIds.push(clientId);
+        }
+        // TODO clientIds.push(clientSockets[i].store.data.name);
+      }
+
+      console.log(socket.id);
+      callback(clientIds);
     });
 
     socket.on('update cell', function(data) {
