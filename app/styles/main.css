@@ -95,14 +95,12 @@ body {
 .down-selected .clue.highlight.down {
   /* background-color: #9BD8ED !important; */
   /* background-color: #D9EDF7 !important;*/
-  color: #888;
   box-shadow: 0 0 8px rgba(82, 168, 236, 0.75);
 }
 
 .across-selected .clue.highlight.down,
 .down-selected .clue.highlight.across {
   background-color: #eee;
-  color: #888;
 }
 
 .clue-number {
@@ -115,6 +113,10 @@ body {
 .clue.complete {
   text-decoration: line-through;
   color: #ddd;
+}
+
+.clue.highlight.complete {
+  color: #888;
 }
 
 .num-players {
