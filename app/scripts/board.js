@@ -72,6 +72,16 @@ mod.service('Board', function(Cell, Clue, $rootScope) {
           cell.content(cellContent, false);
         }
 
+        // Link cells together. This comes in useful in SelectedManager
+        // when you want to select the next cell to the right, for example.
+        if (rowIdx > 0) {
+          cell.linkDown(cells[rowIdx - 1][colIdx]);
+        }
+
+        if (colIdx > 0) {
+          cell.linkAcross(cells[rowIdx][colIdx - 1]);
+        }
+
         if (!isBlock) {
 
           /* 
@@ -92,17 +102,6 @@ mod.service('Board', function(Cell, Clue, $rootScope) {
           */
           var cellLeftKey = [rowIdx, colIdx - 1]
           var isAcrossStart = colIdx == 0 || blocksIndex[cellLeftKey];
-
-
-          // Link cells together. This comes in useful in SelectedManager
-          // when you want to select the next cell to the right, for example.
-          if (rowIdx > 0) {
-            cell.linkDown(cells[rowIdx - 1][colIdx]);
-          }
-
-          if (colIdx > 0) {
-            cell.linkAcross(cells[rowIdx][colIdx - 1]);
-          }
 
 
           // If this cell starts a new clue, increment the clue number,

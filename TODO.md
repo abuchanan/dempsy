@@ -13,3 +13,4 @@
 - crossword board should remain fixed while scrolling clues, or clues should have their own scrollbars
 - one-liner dev step
 - mock for mongodb
+- message on completion of all clues

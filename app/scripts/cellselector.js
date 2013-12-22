@@ -114,11 +114,22 @@ mod.factory('CellSelector', function() {
       return direction;
     }
 
+    function _findInDirection(start, nextOrPrev, direction) {
+      if (!start) return;
+      var current = start;
+      while (current === start || current.isBlock()) {
+        var next = current[nextOrPrev][direction];
+        if (!next) break
+        current = next;
+      }
+      return current;
+    }
+
     this.prevCell = function() {
       var current = selected.cell;
       if (current) {
-        var prev = current.prev[direction];
-        if (prev) {
+        var prev = _findInDirection(current, 'prev', direction);
+        if (prev !== current) {
           this.cell(prev, direction);
         }
       }
@@ -127,8 +138,8 @@ mod.factory('CellSelector', function() {
     this.nextCell = function() {
       var current = selected.cell;
       if (current) {
-        var next = current.next[direction];
-        if (next) {
+        var next = _findInDirection(current, 'next', direction);
+        if (next !== current) {
           this.cell(next, direction);
         }
       }
