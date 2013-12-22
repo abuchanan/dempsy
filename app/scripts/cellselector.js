@@ -69,8 +69,6 @@ mod.factory('CellSelector', function() {
         _clearCell();
         _clearClues();
 
-        console.log(cell.startsAcross(), cell.startsDown());
-        console.log(cell.prev);
         if (!cell.startsAcross() && cell.startsDown()) {
           var defaultDirection = 'down';
         } else {
@@ -109,8 +107,11 @@ mod.factory('CellSelector', function() {
       return '';
     };
 
-    this.setDirection = function(_direction) {
-      direction = _direction;
+    this.direction = function(_direction) {
+      if (_direction !== undefined) {
+        direction = _direction;
+      }
+      return direction;
     }
 
     this.prevCell = function() {

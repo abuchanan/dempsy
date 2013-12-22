@@ -104,23 +104,35 @@ mod.controller('CrosswordCtrl', function ($scope, $routeParams, CrosswordData,
   });
 
   Editor.on('left', function() {
-    cellSelector.setDirection('across');
-    cellSelector.prevCell();
+    if (cellSelector.direction() == 'down') {
+      cellSelector.direction('across');
+    } else {
+      cellSelector.prevCell();
+    }
   });
 
   Editor.on('right', function() {
-    cellSelector.setDirection('across');
-    cellSelector.nextCell();
+    if (cellSelector.direction() == 'down') {
+      cellSelector.direction('across');
+    } else {
+      cellSelector.nextCell();
+    }
   });
 
   Editor.on('up', function() {
-    cellSelector.setDirection('down');
-    cellSelector.prevCell();
+    if (cellSelector.direction() == 'across') {
+      cellSelector.direction('down');
+    } else {
+      cellSelector.prevCell();
+    }
   });
 
   Editor.on('down', function() {
-    cellSelector.setDirection('down');
-    cellSelector.nextCell();
+    if (cellSelector.direction() == 'across') {
+      cellSelector.direction('down');
+    } else {
+      cellSelector.nextCell();
+    }
   });
 
   Editor.on('backspace', function() {
