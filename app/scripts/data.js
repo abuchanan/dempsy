@@ -17,7 +17,7 @@ mod.service('CrosswordData', function(socket, $q, Grid, Board, $timeout) {
       board.on('update cell', function(event, cell) {
         socket.emit('update cell', {
           game_ID: id,
-          cell_ID: [cell.row, cell.col],
+          cell_ID: cell.key,
           content: cell.content(),
         });
       });
