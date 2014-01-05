@@ -4,10 +4,10 @@ var mod = angular.module('dempsy.clue', []);
 
 mod.service('Clue', function() {
 
-  this.create = function(text, direction) {
+  this.create = function(number, text, direction) {
     return {
       text: text,
-      number: direction,
+      number: number,
       direction: direction,
       cells: [],
       _highlighted: false,

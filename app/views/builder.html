@@ -1,45 +1,31 @@
-<div class='row'>
+<button ng-click='finish()'>Done</button>
+
+<div class='row' ng-class='select.directionClass()'>
 
   <div class='col-md-6'>
     <table>
       <tbody>
-        <tr ng-repeat='row in rows track by $index'>
+        <tr ng-repeat='row in cells track by $index'>
           <td class='crossword-cell'
-              ng-repeat='col in row track by $index'
-              ng-class='col.cssClass()'
-              ng-click='col.toggleEmpty()'>
-            <span class='cell-number' ng-show='!col.empty'>{{ col.number }}</span> {{ col.content }}</td>
+              ng-repeat='cell in row track by $index'
+              ng-class='cell.cssClass()'
+              ng-click='toggleBlock(cell)'>
+            <div class='cell-number' ng-show='!cell.empty()'>{{ cell.number }}</div>
+            <div class='cell-content'></div>
+          </td>
         </tr>
       </tbody>
     </table>
-
-    <button ng-click='inspect()'>Inspect</button>
-
-    <textarea ng-model='crosswordJson' style='height: 200px; width: 500px;'></textarea>
-    </div>
+  </div>
 
   <div class='col-md-3'>
     <h3>Across</h3>
-    <ul class='list-unstyled'>
-      <li class='clue'
-          ng-class='{highlight: q === highlight.question}'
-          ng-repeat='q in across | orderBy:number'
-          ng-click='highlight.question = q'>
-        <span class='clue-number'>{{ q.number }}</span> {{ q.clue }}
-      </li>
-    </ul>
+    <textarea ng-model='rawAcross' style='height: 500px; width: 90%'></textarea>
   </div>
 
   <div class='col-md-3'>
     <h3>Down</h3>
-    <ul class='list-unstyled'>
-      <li class='clue' 
-          ng-class='{highlight: q === highlight.question}'
-          ng-repeat='q in down | orderBy:number'
-          ng-click='highlight.question = q'>
-        <span class='clue-number'>{{ q.number }}</span> {{ q.clue }}</li>
-    </ul>
+    <textarea ng-model='rawDown' style='height: 500px; width: 90%'></textarea>
   </div>
-
 
 </div>

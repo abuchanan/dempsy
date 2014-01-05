@@ -3,7 +3,7 @@
 var mod = angular.module('dempsy.data', []);
 
 
-mod.service('CrosswordData', function(socket, $q, Board, $timeout) {
+mod.service('CrosswordData', function(socket, $q, Grid, Board, $timeout) {
 
   this.get = function(id) {
 
@@ -11,8 +11,8 @@ mod.service('CrosswordData', function(socket, $q, Board, $timeout) {
 
     socket.emit('load game', id, function(data) {
 
-      var board = Board.build(data.board.size, data.board.blocks,
-                              data.board.clues, data.content);
+      var grid = Grid.create(data.board.size, data.board.blocks);
+      var board = Board.build(grid, data.board.clues, data.content);
 
       board.on('update cell', function(event, cell) {
         socket.emit('update cell', {

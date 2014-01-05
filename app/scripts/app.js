@@ -9,6 +9,7 @@ var mod = angular.module('dempsy', [
   'dempsy.clue',
   'dempsy.board',
   'dempsy.editor',
+  'dempsy.builder',
 ]);
 
 
@@ -85,10 +86,10 @@ mod.controller('CrosswordCtrl', function ($scope, $routeParams, CrosswordData,
   var cellSelector = $scope.select = CellSelector.create();
 
   crosswordPromise.then(function(game) {
-    $scope.cells = game.board.cells;
+    $scope.cells = game.board.grid.cells;
     $scope.clues = game.board.clues;
     $scope.room = game.room;
-    cellSelector.cell(game.board.cells[0][0]);
+    cellSelector.cell(game.board.grid.cells[0][0]);
     $scope.loading = false;
   });
 

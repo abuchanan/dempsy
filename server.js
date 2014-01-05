@@ -29,6 +29,22 @@ mongo.MongoClient.connect(mongoUri, function (err, db) {
 
   sockets.on('connection', function (socket) {
 
+    socket.on('save board', function(data, callback) {
+      boards.insert(data, function(err, records) {
+        var board_id = records[0]._id;
+        games.insert({board_id: board_id, content: {}}, function(err, game_recs) {
+          var game_id = game_recs[0]._id;
+          console.log('Game created at: http://localhost:8081/#/crossword/' + game_id);
+
+          callback({
+            board: board_id,
+            game: game_id,
+          });
+          db.close();
+        });
+      });
+    });
+
     socket.on('load game', function(ID, callback) {
       socket.join('crossword-room-' + ID);
 
