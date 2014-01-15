@@ -29,6 +29,16 @@ mongo.MongoClient.connect(mongoUri, function (err, db) {
 
   sockets.on('connection', function (socket) {
 
+    socket.on('list games', function(data, callback) {
+      games.find().toArray(function(err, results) {
+        var game_IDs = [];
+        for (var i = 0; i < results.length; i++) {
+          game_IDs.push(results[i]._id);
+        }
+        callback(game_IDs);
+      });
+    });
+
     socket.on('save board', function(data, callback) {
       boards.insert(data, function(err, records) {
         var board_id = records[0]._id;

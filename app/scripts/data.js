@@ -5,6 +5,15 @@ var mod = angular.module('dempsy.data', []);
 
 mod.service('CrosswordData', function(socket, $q, Grid, Board, $timeout) {
 
+  this.list = function() {
+    var deferred = $q.defer();
+    socket.emit('list games', {}, function(data) {
+      deferred.resolve(data);
+    });
+
+    return deferred.promise;
+  };
+
   this.get = function(id) {
 
     var deferred = $q.defer();

@@ -29,7 +29,10 @@ mod.config(function ($routeProvider) {
 });
 
 
-mod.controller('MainCtrl', function($scope) {
+mod.controller('MainCtrl', function($scope, CrosswordData) {
+  CrosswordData.list().then(function(data) {
+    $scope.game_IDs = data;
+  });
    // TODO UI for starting a new crossword, or selecting from an existing instance.
 });
 
