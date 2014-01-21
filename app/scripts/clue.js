@@ -10,41 +10,20 @@ mod.service('Clue', function() {
       number: number,
       direction: direction,
       cells: [],
-      _highlighted: false,
 
-      cssClass: function() {
-        var self = this;
-
-        // If the clue has all its cells filled,
-        // give it the "complete" class.
+      isComplete: function() {
         var complete = true;
-        angular.forEach(self.cells, function(cell) {
-          if (!cell.content()) {
+        angular.forEach(this.cells, function(cell) {
+          if (!cell.content || cell.content == '') {
             complete = false;
           }
         });
-
-        var d = {
-          highlight: self._highlighted,
-          complete: complete,
-        }
-        d[self.direction] = true;
-        return d
+        return complete;
       },
 
-      isHighlighted: function() {
-        return this._highlighted;
-      },
-
-      setHighlight: function(val) {
-        val = Boolean(val);
-        this._highlighted = val;
-        var direction = this.direction;
-
-        angular.forEach(this.cells, function(cell) {
-          cell.highlight = val;
-          cell.highlightDirection = direction;
-        });
+      hasCell: function(cell) {
+        var idx = this.cells.indexOf(cell);
+        return idx != -1;
       },
     }
   };

@@ -2,13 +2,12 @@
 
 var mod = angular.module('dempsy', [
   'ngRoute',
-  'btford.socket-io',
-  'dempsy.cell',
   'dempsy.data',
-  'dempsy.cellselector',
-  'dempsy.clue',
+  'dempsy.selected',
+  'dempsy.loading',
+  'dempsy.clueList',
   'dempsy.board',
-  'dempsy.editor',
+  'dempsy.keybindings',
   'dempsy.builder',
 ]);
 
@@ -36,115 +35,55 @@ mod.controller('MainCtrl', function($scope, CrosswordData) {
    // TODO UI for starting a new crossword, or selecting from an existing instance.
 });
 
-mod.directive('loading', function($timeout) {
-  return {
-    scope: {
-      loading: '=',
-    },
-    template: '<div>Loading{{ extra }}</div>',
-    link: function($scope) {
-      var fun = [
-        'yup, still loading',
-        'sigh',
-        "how you doin'?",
-        "how 'bout that weather, eh?",
-        'burp',
-        'sssoooooo',
-        'awkward turtle',
-        'any second now',
-        'patience is a virtue',
-      ];
-
-      var ticks = 0;
-      // TODO configurable
-      var interval = 1000;
-      $scope.extra = '';
-
-      function tick() {
-        ticks += 1;
-        if (ticks % 5 == 0 && fun.length > 0) {
-          var idx = Math.floor(Math.random() * fun.length);
-          var item = fun.splice(idx, 1);
-          $scope.extra += item;
-        } else {
-          $scope.extra += '.';
-        }
-        if ($scope.loading) {
-          $timeout(tick, interval);
-        }
-      }
-      tick();
-    },
-  }
-});
 
 mod.controller('CrosswordCtrl', function ($scope, $routeParams, CrosswordData,
-                                          CellSelector, Editor) {
+                                          Selected, KeyBindings) {
 
-  $scope.loading = true;
+  $scope.selected = Selected.create();
 
-  var id = $routeParams.id;
-  var crosswordPromise = CrosswordData.get(id);
+  CrosswordData.get($routeParams.id)
+    .then(function(game) {
+      $scope.cells = game.board.grid.cells;
+      $scope.clues = game.board.clues;
+      $scope.room = game.room;
 
-  var cellSelector = $scope.select = CellSelector.create();
+      $scope.selected.cell = game.board.grid.cells[0][0];
 
-  crosswordPromise.then(function(game) {
-    $scope.cells = game.board.grid.cells;
-    $scope.clues = game.board.clues;
-    $scope.room = game.room;
-    cellSelector.cell(game.board.grid.cells[0][0]);
-    $scope.loading = false;
-  });
+      //$scope.broadcast('done-loading');
+    });
 
 
-  Editor.on('update', function(event, c) {
-    var cell = cellSelector.current();
-    // TODO shouldn't have to check if (cell)
-    //      if we're getting this event, a cell should be selected.
-    if (cell) {
-      cell.content(c);
-      cellSelector.nextCell();
+  $scope.cellClasses = function(cell) {
+    return {
+      selected: cell === $scope.selected.cell,
+      highlight: $scope.selected.clue && $scope.selected.clue.hasCell(cell),
+      block: cell.isBlock,
     }
-  });
+  };
 
-  Editor.on('left', function() {
-    if (cellSelector.direction() == 'down') {
-      cellSelector.direction('across');
+  $scope.select = function(cell) {
+    if (cell === $scope.selected.cell) {
+      $scope.selected.flipDirection();
     } else {
-      cellSelector.prevCell();
+      $scope.selected.selectAndGuessDirection(cell);
     }
-  });
+  };
 
-  Editor.on('right', function() {
-    if (cellSelector.direction() == 'down') {
-      cellSelector.direction('across');
-    } else {
-      cellSelector.nextCell();
-    }
-  });
+  KeyBindings.on('left', $scope.selected.left);
+  KeyBindings.on('right', $scope.selected.right);
+  KeyBindings.on('up', $scope.selected.up);
+  KeyBindings.on('down', $scope.selected.down);
 
-  Editor.on('up', function() {
-    if (cellSelector.direction() == 'across') {
-      cellSelector.direction('down');
-    } else {
-      cellSelector.prevCell();
-    }
+  KeyBindings.on('character', function(event, c) {
+    $scope.selected.cell.content = c;
+    $scope.selected.next();
   });
+  // TODO have spacebar change direction
 
-  Editor.on('down', function() {
-    if (cellSelector.direction() == 'across') {
-      cellSelector.direction('down');
-    } else {
-      cellSelector.nextCell();
-    }
-  });
 
-  Editor.on('backspace', function() {
-    var cell = cellSelector.current();
-    if (cell) {
-      cell.content('');
-      cellSelector.prevCell();
-    }
+  KeyBindings.on('backspace', function() {
+    $scope.selected.cell.content= '';
+    $scope.selected.previous();
   });
 
 });

@@ -2,11 +2,10 @@
 
 var mod = angular.module('dempsy.builder', [
   'ngRoute',
-  'dempsy.cell',
+  'btford.socket-io',
   'dempsy.data',
-  'dempsy.clue',
   'dempsy.board',
-  'dempsy.editor',
+  'dempsy.keybindings',
 ]);
 
 

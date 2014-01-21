@@ -1,0 +1,9 @@
+<ul class='list-unstyled clue-list' ng-class='listClasses'>
+  <li class='clue'
+      ng-repeat='clue in clues | orderBy:number'
+      ng-class='cssClass(clue)'
+      ng-click='select(clue)'>
+    <span class='clue-number'>{{ clue.number }}</span>
+    <span class='clue-text'>{{ clue.text }}</span>
+  </li>
+</ul>

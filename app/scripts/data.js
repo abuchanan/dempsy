@@ -1,9 +1,11 @@
 'use strict';
 
-var mod = angular.module('dempsy.data', []);
+var mod = angular.module('dempsy.data', [
+  'btford.socket-io',
+]);
 
 
-mod.service('CrosswordData', function(socket, $q, Grid, Board, $timeout) {
+mod.service('CrosswordData', function(socket, $q, Grid, Board, $timeout, $rootScope) {
 
   this.list = function() {
     var deferred = $q.defer();
@@ -21,28 +23,30 @@ mod.service('CrosswordData', function(socket, $q, Grid, Board, $timeout) {
     socket.emit('load game', id, function(data) {
 
       var grid = Grid.create(data.board.size, data.board.blocks);
-      var board = Board.build(grid, data.board.clues, data.content);
+      var board = Board.create(grid, data.board.clues, data.content);
 
-      board.on('update cell', function(event, cell) {
-        socket.emit('update cell', {
-          game_ID: id,
-          cell_ID: cell.key,
-          content: cell.content(),
+      grid.forEachCell(function(cell) {
+        $rootScope.$watch(function() { return cell.content }, function() {
+          socket.emit('update cell', {
+            game_ID: id,
+            cell_ID: cell.key,
+            content: cell.content,
+          });
         });
       });
 
       socket.on('cell updated', function(data) {
-        console.log('cell updated', data);
         var row = data.cell_ID[0];
         var col = data.cell_ID[1];
-        board.cells[row][col].content(data.content, false);
+        board.cells[row][col].content = data.content;
       });
 
       var room = {
         clients: [],
       };
       // In milliseconds
-      var roomUpdateInterval = 10 * 1000;
+      // TODO configurable
+      var roomUpdateInterval = 5 * 1000;
 
       // TODO should this really do polling? Maybe it should just wait for
       //      join/leave broadcast events? What if those are dropped?

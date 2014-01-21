@@ -1,6 +1,9 @@
 'use strict';
 
-var mod = angular.module('dempsy.board', []);
+var mod = angular.module('dempsy.board', [
+  'dempsy.clue',
+  'dempsy.cell',
+]);
 
 
 mod.service('ClueFactory', function(Clue) {
@@ -109,11 +112,10 @@ mod.service('Grid', function(Cell) {
 });
 
 
-mod.service('Board', function($rootScope, ClueFactory) {
+mod.service('Board', function(ClueFactory) {
 
-  this.build = function(grid, rawClues, content) {
+  this.create = function(grid, rawClues, content) {
 
-    var scope = $rootScope.$new(true);
     var clueFactory = ClueFactory.create(rawClues.across, rawClues.down);
     var clues = {
       across: [],
@@ -122,13 +124,9 @@ mod.service('Board', function($rootScope, ClueFactory) {
 
     grid.forEachCell(function(cell) {
 
-      cell.on('update', function(event, cell) {
-        scope.$broadcast('update cell', cell);
-      });
-
       var cellContent = content[cell.key];
       if (cellContent !== undefined) {
-        cell.content(cellContent, false);
+        cell.content = cellContent;
       }
 
       if (cell.startsAcross()) {
@@ -147,9 +145,6 @@ mod.service('Board', function($rootScope, ClueFactory) {
     return {
       grid: grid,
       clues: clues,
-      on: function() {
-        scope.$on.apply(scope, arguments);
-      },
     }
   };
 

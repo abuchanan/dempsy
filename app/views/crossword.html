@@ -1,6 +1,4 @@
-<div ng-show='loading' loading='loading'></div>
-
-<div ng-hide='loading'>
+<div>
   <div class='num-players' ng-show='room.clients.length'>
     <ng-pluralize count='room.clients.length'
                   when="{'one': '1 other player',
@@ -8,7 +6,7 @@
     </ng-pluralize>
   </div>
 
-  <div class='row' ng-class='select.directionClass()'>
+  <div class='row'>
 
     <div class='col-md-6'>
       <table>
@@ -16,10 +14,10 @@
           <tr ng-repeat='row in cells track by $index'>
             <td class='crossword-cell'
                 ng-repeat='cell in row track by $index'
-                ng-class='cell.cssClass()'
-                ng-click='select.cell(cell)'>
-              <div class='cell-number' ng-show='!cell.empty()'>{{ cell.number }}</div>
-              <div class='cell-content'>{{ cell.content() }}</div>
+                ng-class='cellClasses(cell)'
+                ng-click='select(cell)'>
+              <div class='cell-number' ng-show='!cell.isBlock'>{{ cell.number }}</div>
+              <div class='cell-content'>{{ cell.content }}</div>
             </td>
           </tr>
         </tbody>
@@ -27,28 +25,11 @@
     </div>
 
     <div class='col-md-3'>
-      <h3>Across</h3>
-      <ul class='list-unstyled'>
-        <li class='clue'
-            ng-repeat='clue in clues.across | orderBy:number'
-            ng-class='clue.cssClass()'
-            ng-click='select.clue(clue)'>
-          <span class='clue-number'>{{ clue.number }}</span> {{ clue.text }}
-        </li>
-      </ul>
+      <clue-list clues='clues.across' selected='selected.clue'></clue-list>
     </div>
 
     <div class='col-md-3'>
-      <h3>Down</h3>
-      <ul class='list-unstyled'>
-        <li class='clue'
-            ng-repeat='clue in clues.down | orderBy:number'
-            ng-class='clue.cssClass()'
-            ng-click='select.clue(clue)'>
-          <span class='clue-number'>{{ clue.number }}</span> {{ clue.text }}
-        </li>
-      </ul>
+      <clue-list clues='clues.down' selected='selected.clue'></clue-list>
     </div>
 
-  </div>
 </div>

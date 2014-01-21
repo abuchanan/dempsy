@@ -1,4 +1,4 @@
-describe('Editor', function() {
+describe('KeyBindings', function() {
 
   var editor;
 
@@ -30,6 +30,7 @@ describe('Editor', function() {
     });
   });
 
+  /*
   describe('#on()', function() {
 
     it('broadcasts an "update" event when character keys are pressed', function() {
@@ -43,5 +44,6 @@ describe('Editor', function() {
     });
 
   });
+  */
 
 });
