@@ -2,7 +2,8 @@
   <li class='clue'
       ng-repeat='clue in clues | orderBy:number'
       ng-class='cssClass(clue)'
-      ng-click='select(clue)'>
+      ng-click='select(clue)'
+      clue-list-item='clue'>
     <span class='clue-number'>{{ clue.number }}</span>
     <span class='clue-text'>{{ clue.text }}</span>
   </li>

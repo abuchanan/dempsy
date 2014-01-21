@@ -31,3 +31,16 @@ mod.directive('clueList', function() {
     }
   }
 });
+
+mod.directive('clueListItem', function() {
+  return {
+    link: function($scope, $element) {
+
+      $scope.$watch('selected', function() {
+        if ($scope.selected === $scope.clue) {
+          $element.scrollIntoView();
+        }
+      });
+    },
+  }
+});
