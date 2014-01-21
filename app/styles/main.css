@@ -72,8 +72,9 @@ body {
 
 
 .clue-list {
-  height: 300px;
-  overflow: scroll;
+  height: 600px;
+  overflow-y: scroll;
+  padding: 0 5px;
 }
 
 .clue {
@@ -81,7 +82,10 @@ body {
 }
 
 .clue.selected {
-  box-shadow: 0 0 8px rgba(82, 168, 236, 0.75);
+  padding: 5px 0;
+}
+.clue.selected .clue-inner {
+  box-shadow: 0 0 3px rgba(82, 168, 236, 0.75);
 }
 
 .clue.selected.complete {
