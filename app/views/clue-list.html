@@ -4,9 +4,11 @@
       ng-class='cssClass(clue)'
       ng-click='select(clue)'
       clue-list-item='clue'>
-    <div class='clue-inner'>
-      <span class='clue-number'>{{ clue.number }}</span>
-      <span class='clue-text'>{{ clue.text }}</span>
+    <div class='clue-highlight'>
+      <div class='clue-inner'>
+        <span class='clue-number'>{{ clue.number }}</span>
+        <span class='clue-text'>{{ clue.text }}</span>
+      </div>
     </div>
   </li>
 </ul>

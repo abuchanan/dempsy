@@ -67,7 +67,7 @@ body {
 }
 
 .crossword-cell.selected {
-  box-shadow: 0 0 3px rgba(82, 168, 236, 0.75);
+  background-color: rgba(82, 168, 236, 0.15);
 }
 
 
@@ -81,11 +81,8 @@ body {
   cursor: default;
 }
 
-.clue.selected {
-  padding: 5px 0;
-}
-.clue.selected .clue-inner {
-  box-shadow: 0 0 3px rgba(82, 168, 236, 0.75);
+.clue.selected .clue-highlight {
+  background-color: rgba(82, 168, 236, 0.15);
 }
 
 .clue.selected.complete {
@@ -93,18 +90,31 @@ body {
 }
 
 .clue-list.secondary .clue.selected {
-  box-shadow: none;
   background-color: #eee;
 }
 
-.clue-number {
-  display: inline-block;
-  width: 20px;
-  text-align: right;
-  margin-right: 10px;
+.clue-inner {
+  display: table-row;
 }
 
-.clue.complete {
+.clue-number {
+  display: table-cell;
+  min-width: 20px;
+  text-align: right;
+  font-weight: bold;
+}
+
+.clue-text {
+  display: table-cell;
+  padding-left: 10px;
+  width: 100%;
+}
+
+.clue.complete .clue-text {
+  color: #ddd;
+}
+
+.clue.complete .clue-number {
   text-decoration: line-through;
   color: #ddd;
 }
