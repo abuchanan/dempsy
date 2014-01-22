@@ -37,7 +37,7 @@ mod.controller('MainCtrl', function($scope, CrosswordData) {
 
 
 mod.controller('CrosswordCtrl', function ($scope, $routeParams, CrosswordData,
-                                          Selected, KeyBindings) {
+                                          Selected, KeyBindings, $document) {
 
   $scope.selected = Selected.create();
 
@@ -61,12 +61,17 @@ mod.controller('CrosswordCtrl', function ($scope, $routeParams, CrosswordData,
     }
   };
 
-  $scope.select = function(cell) {
+  $scope.focusCell = function(cell) {
     if (cell === $scope.selected.cell) {
       $scope.selected.flipDirection();
     } else {
       $scope.selected.selectAndGuessDirection(cell);
     }
+    KeyBindings.enabled = true;
+  };
+
+  $scope.focusNotes = function() {
+    KeyBindings.enabled = false;
   };
 
   KeyBindings.on('left', $scope.selected.left);
@@ -78,8 +83,6 @@ mod.controller('CrosswordCtrl', function ($scope, $routeParams, CrosswordData,
     $scope.selected.cell.content = c;
     $scope.selected.next();
   });
-  // TODO have spacebar change direction
-
 
   KeyBindings.on('backspace', function() {
     $scope.selected.cell.content= '';

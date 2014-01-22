@@ -72,7 +72,7 @@ body {
 
 
 .clue-list {
-  height: 600px;
+  height: 300px;
   overflow-y: scroll;
   padding: 0 5px;
 }
@@ -115,8 +115,13 @@ body {
 }
 
 .clue.complete .clue-number {
-  text-decoration: line-through;
   color: #ddd;
+}
+
+
+.clue-notes textarea {
+  width: 100%;
+  height: 300px;
 }
 
 

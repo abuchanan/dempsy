@@ -15,7 +15,7 @@
             <td class='crossword-cell'
                 ng-repeat='cell in row track by $index'
                 ng-class='cellClasses(cell)'
-                ng-click='select(cell)'>
+                ng-click='focusCell(cell)'>
               <div class='cell-number' ng-show='!cell.isBlock'>{{ cell.number }}</div>
               <div class='cell-content'>{{ cell.content }}</div>
             </td>
@@ -24,12 +24,21 @@
       </table>
     </div>
 
-    <div class='col-md-3'>
-      <clue-list clues='clues.across' selected='selected.clue'></clue-list>
-    </div>
+    <div class='col-md-6'>
+      <div class='row'>
+        <div class='col-md-6'>
+          <clue-list clues='clues.across' selected='selected.clue'></clue-list>
+        </div>
 
-    <div class='col-md-3'>
-      <clue-list clues='clues.down' selected='selected.clue'></clue-list>
+        <div class='col-md-6'>
+          <clue-list clues='clues.down' selected='selected.clue'></clue-list>
+        </div>
+      </div>
+      <div class='row'>
+        <div class='clue-notes'>
+          <textarea ng-focus='focusNotes()'>foo</textarea>
+        </div>
+      </div>
     </div>
 
 </div>
