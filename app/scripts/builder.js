@@ -47,6 +47,14 @@ mod.controller('BuilderCtrl', function ($scope, Grid, socket) {
     buildGrid();
   }
 
+  $scope.cellClasses = function(cell) {
+    return {
+      //selected: cell === $scope.selected.cell,
+      //highlight: $scope.selected.clue && $scope.selected.clue.hasCell(cell),
+      block: cell.isBlock,
+    }
+  };
+
   function getBlocks() {
     var blocks = [];
     if (grid) {

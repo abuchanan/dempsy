@@ -8,9 +8,9 @@
         <tr ng-repeat='row in cells track by $index'>
           <td class='crossword-cell'
               ng-repeat='cell in row track by $index'
-              ng-class='cell.cssClass()'
+              ng-class='cellClasses(cell)'
               ng-click='toggleBlock(cell)'>
-            <div class='cell-number' ng-show='!cell.empty()'>{{ cell.number }}</div>
+            <div class='cell-number' ng-show='!cell.isBlock'>{{ cell.number }}</div>
             <div class='cell-content'></div>
           </td>
         </tr>
