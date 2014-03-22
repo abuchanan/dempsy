@@ -12,6 +12,8 @@ function scrape(html) {
     function (errors, window) {
 
       var $ = window.$;
+      var title = $('#CPHContent_TitleLabel').text()
+
       var board = $('#CPHContent_PuzTable');
       var first_row = board.find('tr:first > td');
 
@@ -55,12 +57,17 @@ function scrape(html) {
       var down_clues = scrape_clues($('#CPHContent_DownClues'));
 
       var dempsy_board = {
-        'shape': 'square',
-        'size': board_size,
-        'blocks': blocks,
-        'clues': {
-          'across': across_clues,
-          'down': down_clues,
+        'board': {
+          'shape': 'square',
+          'size': board_size,
+          'blocks': blocks,
+          'clues': {
+            'across': across_clues,
+            'down': down_clues,
+          }
+        },
+        'game': {
+          'title': title,
         }
       };
 

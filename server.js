@@ -31,11 +31,18 @@ mongo.MongoClient.connect(mongoUri, function (err, db) {
 
     socket.on('list games', function(data, callback) {
       games.find().toArray(function(err, results) {
-        var game_IDs = [];
+        var games = [];
+
         for (var i = 0; i < results.length; i++) {
-          game_IDs.push(results[i]._id);
+          var res = results[i];
+          var game = {
+            ID: res._id,
+            title: res.title || 'Untitled',
+          }
+          games.push(game);
         }
-        callback(game_IDs);
+
+        callback(games);
       });
     });
 

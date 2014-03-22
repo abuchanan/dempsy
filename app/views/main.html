@@ -1,5 +1,5 @@
 <h2>Games</h2>
 <a href='#/crossword/builder'>New Game</a>
 <ul>
-  <li ng-repeat='game_ID in game_IDs'><a href='#/crossword/{{ game_ID }}'>{{ game_ID }}</a></li>
+  <li ng-repeat='game in games'><a href='#/crossword/{{ game.ID }}'>{{ game.title }}</a></li>
 </ul>

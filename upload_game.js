@@ -29,13 +29,18 @@ read({prompt: 'Mongo DB password: ', silent: true}, function(er, password) {
     var games = db.collection('games');
     var boards = db.collection('boards');
 
-    fs.readFile(file, 'utf8', function(err, data) {
+    fs.readFile(file, 'utf8', function(err, raw_data) {
       if (err) throw err;
 
-      data = JSON.parse(data);
-      boards.insert(data, function(err, records) {
+      data = JSON.parse(raw_data);
+      boards.insert(data.board, function(err, records) {
         
-        var game_data = {board_id: records[0]._id, content: {}};
+        var game_data = {
+          title: data.game.title,
+          board_id: records[0]._id,
+          content: {}
+        };
+
         games.insert(game_data, function(err, game_recs) {
           console.log('Game created: ' + game_recs[0]._id);
           db.close();
