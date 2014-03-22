@@ -1,4 +1,4 @@
-var usage = 'usage: node create_game.js -u <mongodb_user> -h <mongodb_host> -d <mongodb_database> -f <game.json>';
+var usage = 'usage: node upload_game.js -u <mongodb_user> -h <mongodb_host> -d <mongodb_database> -f <game.json>';
 
 // Parse command line options
 var argv = require('minimist')(process.argv.slice(2));
