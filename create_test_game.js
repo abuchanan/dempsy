@@ -1,27 +1,45 @@
+var usage = 'usage: node create_game.js -u <mongodb_user> -h <mongodb_host> -d <mongodb_database> -f <game.json>';
+
+// Parse command line options
+var argv = require('minimist')(process.argv.slice(2));
+
+var user = argv['u'];
+var host = argv['h'];
+var db = argv['d'];
+var file = argv['f'];
+
+if (!user || !host || !db || !file) {
+  console.log(usage);
+  process.exit(1);
+}
+
+
 var fs = require('fs');
-var file = __dirname + '/mongo-crossword-import.json';
-
 var mongo = require('mongodb');
+var read = require('read');
+var util = require('util');
 
-var mongoUri = process.env.MONGOLAB_URI ||
-               process.env.MONGOHQ_URL ||
-               'mongodb://localhost/dempsy1';
+read({prompt: 'Mongo DB password: ', silent: true}, function(er, password) {
 
-mongo.MongoClient.connect(mongoUri, function (err, db) {
-  if (err) throw err;
+  var mongoURI = util.format('mongodb://%s:%s@%s/%s', user, password, host, db);
 
-  var games = db.collection('games');
-  var boards = db.collection('boards');
-
-  fs.readFile(file, 'utf8', function(err, data) {
+  mongo.MongoClient.connect(mongoURI, function (err, db) {
     if (err) throw err;
 
-    data = JSON.parse(data);
-    boards.insert(data, function(err, records) {
-      
-      games.insert({board_id: records[0]._id, content: {}}, function(err, game_recs) {
-        console.log('Game created at: http://localhost:8081/#/crossword/' + game_recs[0]._id);
-        db.close();
+    var games = db.collection('games');
+    var boards = db.collection('boards');
+
+    fs.readFile(file, 'utf8', function(err, data) {
+      if (err) throw err;
+
+      data = JSON.parse(data);
+      boards.insert(data, function(err, records) {
+        
+        var game_data = {board_id: records[0]._id, content: {}};
+        games.insert(game_data, function(err, game_recs) {
+          console.log('Game created: ' + game_recs[0]._id);
+          db.close();
+        });
       });
     });
   });
